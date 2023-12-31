@@ -158,6 +158,8 @@ static
 int
 cmd_dbflags(int nargs, char **args)
 {
+	(void)(args);
+
 	if (nargs != 1) {
 		kprintf("Usage: dbflags\n");
 		return EINVAL;
@@ -169,6 +171,7 @@ cmd_dbflags(int nargs, char **args)
     kprintf("[df 4 on/off]     DB_DEVICE         [df 10 on/off]    DB_NET\n");
     kprintf("[df 5 on/off]     DB_THREADS        [df 11 on/off]    DB_NETFS\n");
     kprintf("[df 6 on/off]     DB_VM             [df 12 on/off]    DB_KMALLOC\n");
+    kprintf("Current value of dbflags is 0x%x\n", dbflags);
 	return 0;
 }
 
