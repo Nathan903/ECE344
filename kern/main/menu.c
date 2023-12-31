@@ -152,6 +152,27 @@ cmd_shell(int nargs, char **args)
 }
 
 /*
+ * Command for changing dbflags.
+ */
+static
+int
+cmd_dbflags(int nargs, char **args)
+{
+	if (nargs != 1) {
+		kprintf("Usage: dbflags\n");
+		return EINVAL;
+	}
+	kprintf("OS/161 Debug flags\n");
+	kprintf("[df 1 on/off]     DB_LOCORE         [df 7 on/off]     DB_EXEC\n");
+    kprintf("[df 2 on/off]     DB_SYSCALL        [df 8 on/off]     DB_VFS\n");
+    kprintf("[df 3 on/off]     DB_INTERRUPT      [df 9 on/off]     DB_SFS\n");
+    kprintf("[df 4 on/off]     DB_DEVICE         [df 10 on/off]    DB_NET\n");
+    kprintf("[df 5 on/off]     DB_THREADS        [df 11 on/off]    DB_NETFS\n");
+    kprintf("[df 6 on/off]     DB_VM             [df 12 on/off]    DB_KMALLOC\n");
+	return 0;
+}
+
+/*
  * Command for changing directory.
  */
 static
@@ -380,6 +401,7 @@ showmenu(const char *name, const char *x[])
 static const char *opsmenu[] = {
 	"[s]       Shell                     ",
 	"[p]       Other program             ",
+	"[dbflags] Debug flags               ",
 	"[mount]   Mount a filesystem        ",
 	"[unmount] Unmount a filesystem      ",
 	"[bootfs]  Set \"boot\" filesystem     ",
@@ -485,6 +507,8 @@ static struct {
 	/* operations */
 	{ "s",		cmd_shell },
 	{ "p",		cmd_prog },
+	{ "dbflags",cmd_dbflags },
+
 	{ "mount",	cmd_mount },
 	{ "unmount",	cmd_unmount },
 	{ "bootfs",	cmd_bootfs },
