@@ -151,9 +151,42 @@ cmd_shell(int nargs, char **args)
 	return common_prog(nargs, args);
 }
 
+// converts positive number string (>=1) to int
+int stringToUInt(const char *str) {
+    if (str == NULL || *str == '\0') return -1;
+
+    int result = 0;
+
+    while (*str != '\0') {
+        if (*str < '0' || *str > '9') return -1;
+        result = result * 10 + (*str - '0');
+        str++;
+    }
+
+    return (result > 0) ? result : -1;
+}
+
 /*
  * Command for changing dbflags.
  */
+static
+int
+cmd_df(int nargs, char **args)
+{
+	// make sure nr is a int from 1 to 12
+	if (nargs == 3 && 1<=stringToUInt(args[1]) && stringToUInt(args[1])<=12 ) {
+		if (strcmp(args[2], "on") == 0){
+		    dbflags |= (1u << (stringToUInt(args[1])-1) );
+			return 0;
+	    } else if (strcmp(args[2], "off") == 0)	{
+    	    dbflags &= ~(1u << (stringToUInt(args[1])-1) );
+	    	return 0;
+	    }		
+	}
+	kprintf("Usage: df nr on/off\n");
+	return EINVAL;
+}
+
 static
 int
 cmd_dbflags(int nargs, char **args)
@@ -517,6 +550,7 @@ static struct {
 	{ "bootfs",	cmd_bootfs },
 	{ "pf",		printfile },
 	{ "cd",		cmd_chdir },
+	{ "df",		cmd_df },
 	{ "pwd",	cmd_pwd },
 	{ "sync",	cmd_sync },
 	{ "panic",	cmd_panic },
