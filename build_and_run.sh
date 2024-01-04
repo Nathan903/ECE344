@@ -16,14 +16,14 @@ cd ~/ece344/os161
 make > /dev/null
 cd ~/ece344/os161
 cd kern/conf
-./config ASST1 > /dev/null
+./config ASST2 > /dev/null
 
 cd ~/ece344/os161/kern
-cd compile/ASST1
+cd compile/ASST2
 make depend > /dev/null
 make > /dev/null
 make install > /dev/null
 
 cd ~/ece344/build
-cp /cad2/ece344s/tester/sysconfig/sys161-asst1.conf sys161.conf
+cp /cad2/ece344s/tester/sysconfig/sys161-asst2.conf sys161.conf
 sys161 kernel	
