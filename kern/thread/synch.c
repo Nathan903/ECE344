@@ -82,49 +82,57 @@ void V(struct semaphore *sem){
 
 struct lock * lock_create(const char *name){
 	struct lock *lock;
-
 	lock = kmalloc(sizeof(struct lock));
-	if (lock == NULL) {
-		return NULL;
-	}
+	if (lock == NULL) { return NULL;}
 
 	lock->name = kstrdup(name);
 	if (lock->name == NULL) {
 		kfree(lock);
 		return NULL;
 	}
-	
-	// add stuff here as needed
-	
+	lock->cur_user= -1;
+	lock->held = 0; // DONE
 	return lock;
 }
 
 void lock_destroy(struct lock *lock) {
-	assert(lock != NULL);
-
-	// add stuff here as needed
+  assert(lock != NULL);
+  int spl;
+  spl = splhigh();
+  assert(lock->held == 0); 
+  splx(spl);
+  //DONE
 	
 	kfree(lock->name);
 	kfree(lock);
 }
 void lock_acquire(struct lock *lock) {
-	// Write this
+  assert(lock != NULL);
+  int spl;
+  while(1){
+    spl = splhigh();
+      int old = lock->held;
+      lock->held = 1;
+    splx(spl);
+    if(old==0){break;}
+  }
+  //lock->cur_user = getpid();
+  //DONE
 
-	(void)lock;  // suppress warning until code gets written
 }
 
 void lock_release(struct lock *lock) {
-	// Write this
+  assert(lock != NULL);
+  assert(lock->held!=0);
+  lock->held = 0;
+  //DONE
 
-	(void)lock;  // suppress warning until code gets written
 }
 
 int lock_do_i_hold(struct lock *lock){
-	// Write this
+  assert(lock != NULL);
+  return 0;
 
-	(void)lock;  // suppress warning until code gets written
-
-	return 1;    // dummy until code gets written
 }
 
 ////////////////////////////////////////////////////////////
