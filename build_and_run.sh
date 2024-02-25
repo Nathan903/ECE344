@@ -26,4 +26,5 @@ make install > /dev/null
 
 cd ~/ece344/build
 cp /cad2/ece344s/tester/sysconfig/sys161-asst2.conf sys161.conf
+sed -i '0,/autoseed/s//seed=1/' abc
 sys161 kernel	
