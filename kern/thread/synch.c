@@ -90,7 +90,7 @@ struct lock * lock_create(const char *name){
 		kfree(lock);
 		return NULL;
 	}
-	lock->cur_user= -1;
+	lock->cur_user= NULL;
 	lock->held = 0; // DONE
 	return lock;
 }
@@ -117,7 +117,7 @@ void lock_acquire(struct lock *lock) {
     splx(spl);
     if(old==0){break;}
   }
-  //lock->cur_user = getpid();
+  lock->cur_user = curthread;
   //DONE
 
 }
@@ -126,13 +126,14 @@ void lock_release(struct lock *lock) {
   assert(lock != NULL);
   assert(lock->held!=0);
   lock->held = 0;
+  lock->cur_user = NULL;
   //DONE
 
 }
 
 int lock_do_i_hold(struct lock *lock){
   assert(lock != NULL);
-  return 0;
+  return lock->cur_user==curthread && lock->held==1;
 
 }
 
