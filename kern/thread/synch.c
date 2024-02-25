@@ -109,6 +109,7 @@ void lock_destroy(struct lock *lock) {
 void lock_acquire(struct lock *lock) {
   assert(lock != NULL);
   int spl;
+  kprintf("hi");
   while(1){
     spl = splhigh();
       int old = lock->held;
