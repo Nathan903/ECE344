@@ -1,8 +1,8 @@
 #!/bin/bash
-git fetch origin        # Fetches the latest changes from the remote repository
-git reset --hard origin/master  # Resets your local branch to match the remote branch
-git clean -df           # Removes untracked files and directories (use with caution)
-git pull origin master  # Pulls the latest changes from the remote repository
+# git fetch origin        # Fetches the latest changes from the remote repository
+# git reset --hard origin/master  # Resets your local branch to match the remote branch
+# git clean -df           # Removes untracked files and directories (use with caution)
+# git pull origin master  # Pulls the latest changes from the remote repository
 
 set -e
 print_error() {

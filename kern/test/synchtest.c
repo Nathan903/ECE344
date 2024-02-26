@@ -166,6 +166,7 @@ locktestthread(void *junk, unsigned long num)
 int
 locktest(int nargs, char **args)
 {
+	my_flag_2=1;
 	int i, result;
 
 	(void)nargs;

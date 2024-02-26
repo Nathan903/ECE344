@@ -5,6 +5,8 @@
 #ifndef _SYNCH_H_
 #define _SYNCH_H_
 
+extern volatile int my_flag_2;
+
 /*
  * Dijkstra-style semaphore.
  * Operations:

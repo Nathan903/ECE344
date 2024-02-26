@@ -9,6 +9,7 @@
 #include <curthread.h>
 #include <machine/spl.h>
 
+volatile int my_flag_2=0;
 ////////////////////////////////////////////////////////////
 //
 // Semaphore.
@@ -107,9 +108,10 @@ void lock_destroy(struct lock *lock) {
 	kfree(lock);
 }
 void lock_acquire(struct lock *lock) {
+ 
   assert(lock != NULL);
   int spl;
-  // kprintf("hi");
+
   while(1){
     spl = splhigh();
       int old = lock->held;
