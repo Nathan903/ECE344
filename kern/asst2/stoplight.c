@@ -2,10 +2,10 @@
 #include <lib.h>
 #include <test.h>
 #include <thread.h>
-
+#include <synch.h>
 #define NCARS 20
 
-static const char *directions[] = { "N", "E", "S", "W" };
+static const char *directions[] = { "N", "W", "S", "E" };
 static const char *msgs[] = {
   "approaching:",
   "region1:    ",
@@ -23,6 +23,34 @@ static void message(int msg_nr, int carnumber, int cardirection, int destdirecti
     directions[cardirection], directions[destdirection]);
 }
 
+struct semaphore *semaphores[4];
+struct semaphore *allsem;
+
+static void general(unsigned long cardirection, unsigned long carnumber, unsigned long nturns) {
+    unsigned long destdirection = (cardirection + nturns) % 4;
+    unsigned long d, reg;
+    message(APPROACHING, carnumber, cardirection, destdirection);
+    P(allsem);
+    for (d = 0; d < nturns; d++) {
+        P(semaphores[(cardirection + d) % 4]);
+    }
+    V(allsem);
+
+    for (reg = 1; reg <= nturns; reg++) {
+        message(reg, carnumber, cardirection, destdirection);
+    }
+    message(LEAVING, carnumber, cardirection, destdirection);
+    for (d = 0; d < nturns; d++) {
+        V(semaphores[(cardirection + d) % 4]);
+    }
+
+    // int i;
+    // for (i = 0; i < 4; i++) {
+    //     kprintf("%d", semaphores[i]->count);
+    // }
+    // kprintf("\n");
+}
+
 /* gostraight()
  * Arguments:
  *      unsigned long cardirection: the direction from which the car
@@ -34,42 +62,13 @@ static void message(int msg_nr, int carnumber, int cardirection, int destdirecti
  *      Write and comment this function.
  */
 static void gostraight(unsigned long cardirection, unsigned long carnumber) {
-  (void) cardirection;
-  (void) carnumber;
+  general(cardirection, carnumber, 2);
 }
-
-
-/*
- * turnleft()
- * Arguments:
- *      unsigned long cardirection: the direction from which the car
- *              approaches the intersection.
- *      unsigned long carnumber: the car id number for printing purposes.
- * Notes:
- *      This function should implement making a left turn through the 
- *      intersection from any direction.
- *      Write and comment this function.
- */
 static void turnleft(unsigned long cardirection, unsigned long carnumber) {
-  (void) cardirection;
-  (void) carnumber;
+  general(cardirection, carnumber, 3);
 }
-
-
-/*
- * turnright()
- * Arguments:
- *      unsigned long cardirection: the direction from which the car
- *              approaches the intersection.
- *      unsigned long carnumber: the car id number for printing purposes.
- * Notes:
- *      This function should implement making a right turn through the 
- *      intersection from any direction.
- *      Write and comment this function.
- */
 static void turnright(unsigned long cardirection, unsigned long carnumber) {
-  (void) cardirection;
-  (void) carnumber;
+  general(cardirection, carnumber, 1);
 }
 
 
@@ -90,22 +89,13 @@ static void turnright(unsigned long cardirection, unsigned long carnumber) {
  *      above.
  */
 static void approachintersection(void * unusedpointer, unsigned long carnumber) {
-  int cardirection;
-  
-  // Avoid unused variable and function warnings.
-  (void) unusedpointer;
-  (void) carnumber;
-  (void) gostraight;
-  (void) turnleft;
-  (void) turnright;
-
-  // cardirection is set randomly.  
-  cardirection = random() % 4;
+  int cardirection = random() % 4;
   int way = random() % 3;
   if (way== 0) { gostraight(cardirection, carnumber);
   } else if (way == 1) { turnleft(cardirection, carnumber);
   } else { turnright(cardirection, carnumber);
   }
+  (void) unusedpointer;
 }
 
 
@@ -121,6 +111,11 @@ static void approachintersection(void * unusedpointer, unsigned long carnumber) 
  */
 
 int createcars(int nargs, char ** args) {
+  int i;
+  for ( i = 0; i < 4; i++) {
+      semaphores[i] = sem_create("sem", 1);
+  }
+  allsem=sem_create("allsem", 1);
   int index, error;
   //Start NCARS approachintersection() threads.
   for (index = 0; index < NCARS; index++) {
@@ -137,6 +132,10 @@ int createcars(int nargs, char ** args) {
   (void)message;
   (void)nargs;
   (void)args;
+  for (i = 0; i < 4; i++) {
+      sem_destroy(semaphores[i]);
+  }
+  sem_destroy(allsem);
   kprintf("stoplight test done\n");
   return 0;
 }
