@@ -23,30 +23,38 @@ static void message(int msg_nr, int carnumber, int cardirection, int destdirecti
     directions[cardirection], directions[destdirection]);
 }
 
-struct semaphore *semaphores[4];
-struct semaphore *allsem;
-
+struct semaphore *grids[4];
+struct semaphore *grids_edit_mutex;
 static void general(unsigned long cardirection, unsigned long carnumber, unsigned long nturns) {
+    //nturns = how many regions needed
     unsigned long destdirection = (cardirection + nturns) % 4;
     unsigned long d, reg;
-    message(APPROACHING, carnumber, cardirection, destdirection);
-    P(allsem);
-    for (d = 0; d < nturns; d++) {
-        P(semaphores[(cardirection + d) % 4]);
-    }
-    V(allsem);
 
+    //APPROACHING
+    message(APPROACHING, carnumber, cardirection, destdirection);
+   
+    // critical region. we either reserve all or none of the grids
+    P(grids_edit_mutex);
+        // reserve the needed grids
+        for (d = 0; d < nturns; d++) { 
+            P(grids[(cardirection + d) % 4]);
+        }
+    V(grids_edit_mutex);
+
+    // do the turns 
     for (reg = 1; reg <= nturns; reg++) {
         message(reg, carnumber, cardirection, destdirection);
     }
+    // LEAVE
     message(LEAVING, carnumber, cardirection, destdirection);
+    // un-reserve the needed grids 
     for (d = 0; d < nturns; d++) {
-        V(semaphores[(cardirection + d) % 4]);
+        V(grids[(cardirection + d) % 4]); 
     }
 
     // int i;
     // for (i = 0; i < 4; i++) {
-    //     kprintf("%d", semaphores[i]->count);
+    //     kprintf("%d", grids[i]->count);
     // }
     // kprintf("\n");
 }
@@ -62,7 +70,7 @@ static void general(unsigned long cardirection, unsigned long carnumber, unsigne
  *      Write and comment this function.
  */
 static void gostraight(unsigned long cardirection, unsigned long carnumber) {
-  general(cardirection, carnumber, 2);
+  general(cardirection, carnumber, 2); 
 }
 static void turnleft(unsigned long cardirection, unsigned long carnumber) {
   general(cardirection, carnumber, 3);
@@ -91,10 +99,9 @@ static void turnright(unsigned long cardirection, unsigned long carnumber) {
 static void approachintersection(void * unusedpointer, unsigned long carnumber) {
   int cardirection = random() % 4;
   int way = random() % 3;
-  if (way== 0) { gostraight(cardirection, carnumber);
-  } else if (way == 1) { turnleft(cardirection, carnumber);
-  } else { turnright(cardirection, carnumber);
-  }
+  if (way== 0) { gostraight(cardirection, carnumber);} 
+  else if (way == 1) { turnleft(cardirection, carnumber); } 
+  else { turnright(cardirection, carnumber); }
   (void) unusedpointer;
 }
 
@@ -113,9 +120,9 @@ static void approachintersection(void * unusedpointer, unsigned long carnumber) 
 int createcars(int nargs, char ** args) {
   int i;
   for ( i = 0; i < 4; i++) {
-      semaphores[i] = sem_create("sem", 1);
+      grids[i] = sem_create("sem", 1);
   }
-  allsem=sem_create("allsem", 1);
+  grids_edit_mutex=sem_create("grids_edit_mutex", 1);
   int index, error;
   //Start NCARS approachintersection() threads.
   for (index = 0; index < NCARS; index++) {
@@ -133,9 +140,9 @@ int createcars(int nargs, char ** args) {
   (void)nargs;
   (void)args;
   for (i = 0; i < 4; i++) {
-      sem_destroy(semaphores[i]);
+      sem_destroy(grids[i]);
   }
-  sem_destroy(allsem);
+  sem_destroy(grids_edit_mutex);
   kprintf("stoplight test done\n");
   return 0;
 }
