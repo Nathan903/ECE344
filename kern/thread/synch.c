@@ -108,18 +108,18 @@ void lock_destroy(struct lock *lock) {
 	kfree(lock);
 }
 void lock_acquire(struct lock *lock) {
- 
   assert(lock != NULL);
   int spl;
+  spl = splhigh();
 
   while(1){
-    spl = splhigh();
       int old = lock->held;
       lock->held = 1;
-    splx(spl);
     if(old==0){break;}
+    else{	thread_sleep(lock);}
   }
   lock->cur_user = curthread;
+  splx(spl);
   //DONE
 
 }
@@ -127,9 +127,15 @@ void lock_acquire(struct lock *lock) {
 void lock_release(struct lock *lock) {
   assert(lock != NULL);
   assert(lock->held!=0);
+  int spl;
+  spl = splhigh();
+
   lock->held = 0;
+	thread_wakeup(lock);
+
   lock->cur_user = NULL;
   //DONE
+  splx(spl);
 
 }
 
