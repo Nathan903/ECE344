@@ -149,10 +149,8 @@ int lock_do_i_hold(struct lock *lock){
 //
 // CV
 
-
 struct cv * cv_create(const char *name) {
 	struct cv *cv;
-
 	cv = kmalloc(sizeof(struct cv));
 	if (cv == NULL) {
 		return NULL;
@@ -162,32 +160,44 @@ struct cv * cv_create(const char *name) {
 		kfree(cv);
 		return NULL;
 	}
-	
+
 	// add stuff here as needed
-	
+
 	return cv;
 }
 void cv_destroy(struct cv *cv) {
 	assert(cv != NULL);
 
-	// add stuff here as needed
+	int spl = splhigh();
+	assert(thread_hassleepers(cv)==0);
+	splx(spl);
 	
 	kfree(cv->name);
 	kfree(cv);
 }
 void cv_wait(struct cv *cv, struct lock *lock) {
-	// Write this
-	(void)cv;    // suppress warning until code gets written
-	(void)lock;  // suppress warning until code gets written
+	//Release the supplied lock, go to sleep, and, after waking up again, re-acquire the lock.
+	int spl = splhigh();
+	lock_release(lock);
+	thread_sleep(cv);
+	lock_acquire(lock);	
+	splx(spl);
+
 }
 void cv_signal(struct cv *cv, struct lock *lock) {
-	// Write this
-	(void)cv;    // suppress warning until code gets written
-	(void)lock;  // suppress warning until code gets written
+	 int spl = splhigh();
+	thread_wakeup1(cv);
+	splx(spl);
+	(void)lock;
+	(void) cv;
+
 }
 
 void cv_broadcast(struct cv *cv, struct lock *lock) {
-	// Write this
-	(void)cv;    // suppress warning until code gets written
-	(void)lock;  // suppress warning until code gets written
+	 int spl = splhigh();
+	thread_wakeup(cv);
+	splx(spl);
+	(void)lock;
+	(void)cv;
 }
+
