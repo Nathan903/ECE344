@@ -73,7 +73,8 @@ mips_syscall(struct trapframe *tf)
 		break;
 
 	    /* Add stuff here */
- 
+		//
+
 	    default:
 		kprintf("Unknown syscall %d\n", callno);
 		err = ENOSYS;
