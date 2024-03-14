@@ -1,7 +1,7 @@
 #!/bin/bash
 # git fetch origin        # Fetches the latest changes from the remote repository
 # git reset --hard origin/master  # Resets your local branch to match the remote branch
-# git clean -df           # Removes untracked files and directories (use with caution)
+# git clean -df           # Removes untracked files and directories (use with cgaution)
 # git pull origin master  # Pulls the latest changes from the remote repository
 
 set -e
@@ -27,4 +27,7 @@ make install > /dev/null
 cd ~/ece344/build
 cp /cad2/ece344s/tester/sysconfig/sys161-asst3.conf sys161.conf
 sed -i '0,/autoseed/s//seed=1/' sys161.conf
-sys161 kernel	
+cd ..
+cd build
+os161-tester 3 2>&1 | tee ../os161/tester3.txt
+
