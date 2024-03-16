@@ -7,6 +7,8 @@
 #include <machine/trapframe.h>
 #include <kern/callno.h>
 #include <syscall.h>
+#include <thread.h>
+#include <curthread.h>
 
 
 /*
@@ -123,7 +125,16 @@ int sys___time(time_t *seconds, time_t *nanoseconds, int32_t* return_value){
   (*return_value)=(int32_t)s;
   return 0;
 }
-
+int sys_getpid(int32_t* return_value){
+  (*return_value)=curthread->pid;
+  return 0;
+}
+int sys__exit(int32_t exit_code){
+  curthread->exit_code = exit_code;
+  curthread->has_exited = 1;
+  thread_exit();
+  return 0;
+}
 void mips_syscall(struct trapframe *tf) {
   int callno;
   int32_t retval;
@@ -160,6 +171,12 @@ void mips_syscall(struct trapframe *tf) {
     break;
   case SYS_sleep:
     err = sys_sleep(tf->tf_a0);
+    break;
+  case SYS_getpid:
+    err = sys_getpid(&retval);
+    break;
+  case SYS__exit:
+    err = sys__exit(tf->tf_a0);
     break;
   default:
     kprintf("Unknown syscall %d\n", callno);

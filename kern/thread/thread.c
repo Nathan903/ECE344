@@ -24,7 +24,8 @@ typedef enum {
 
 /* Global variable for the thread currently executing at any given time. */
 struct thread *curthread;
-
+int cur_max_pid;
+struct pid_to_threadptr_node pid_to_threadptr[PID_TABLE_LEN];
 /* Table of sleeping threads. */
 static struct array *sleepers;
 
@@ -71,7 +72,22 @@ thread_create(const char *name)
 	
 	// If you add things to the thread structure, be sure to initialize
 	// them here.
+	thread->pid = cur_max_pid;
 	
+	thread->has_exited=0;
+	int i;
+	for(i=0; i<PID_TABLE_LEN ;i++){
+		if (pid_to_threadptr[i].pid==0){
+			pid_to_threadptr[i].pid =cur_max_pid;
+			pid_to_threadptr[i].threadptr=thread;
+		        break;
+		}
+	}
+	
+	cur_max_pid++;
+	if(cur_max_pid== MAX_PID){ //freeze!
+	   splhigh(); while(1){}
+	}
 	return thread;
 }
 
@@ -216,6 +232,8 @@ thread_bootstrap(void)
 	numthreads = 1;
 
 	/* Done */
+	cur_max_pid=1;	
+	
 	return me;
 }
 
