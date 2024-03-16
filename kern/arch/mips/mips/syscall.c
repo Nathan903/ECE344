@@ -1,6 +1,7 @@
 #include <types.h>
 #include <kern/errno.h>
 #include <lib.h>
+#include <clock.h>
 #include <machine/pcb.h>
 #include <machine/spl.h>
 #include <machine/trapframe.h>
@@ -44,78 +45,160 @@
  * (In fact, we recommend you don't use 64-bit quantities at all. See
  * arch/mips/include/types.h.)
  */
+#define ATOMIC_START int spl = splhigh()
+#define ATOMIC_END splx(spl) 
+int /*err*/ sys_write(int fd, const void* buf, size_t nbytes, int32_t* return_value){ 
+  if (!(fd==1 || fd==2)){
+    (*return_value)=-1;
+    return EBADF;
+  } 
+  ATOMIC_START;
+  char* kernel_buffer = kmalloc(nbytes+1);
+  int copyin_failure= copyin(buf,(void *) kernel_buffer, nbytes); //0 on success, EFAULT if a memory
+  if(!copyin_failure) {
+    kernel_buffer[nbytes]='\0';
+    kprintf(kernel_buffer);
+    (*return_value)=nbytes;
+  } else{
+    (*return_value)=-1;
+  }
 
-void
-mips_syscall(struct trapframe *tf)
-{
-	int callno;
-	int32_t retval;
-	int err;
+  ATOMIC_END;
+  kfree((void *)kernel_buffer);
+  return copyin_failure;
+}
+int /*err*/ sys_read(int fd, const void* buf, size_t nbytes, int32_t* return_value ) { 
+  if (!(fd==0)){
+    (*return_value)=-1;
+    return EBADF;
+  }
+  if (nbytes!=1) {
+    (*return_value)=-1;
+    return EUNIMP;
+  }
+  ;
+  char input = getch();
+  int copyout_failure = copyout( (const void *) &input , (userptr_t) buf, sizeof(char));
+  if(!copyout_failure) {
+  (*return_value)=1;
+  } else{
+    (*return_value)=-1;
+  }
 
-	assert(curspl==0);
-
-	callno = tf->tf_v0;
-
-	/*
-	 * Initialize retval to 0. Many of the system calls don't
-	 * really return a value, just 0 for success and -1 on
-	 * error. Since retval is the value returned on success,
-	 * initialize it to 0 by default; thus it's not necessary to
-	 * deal with it except for calls that return other values, 
-	 * like write.
-	 */
-
-	retval = 0;
-
-	switch (callno) {
-	    case SYS_reboot:
-		err = sys_reboot(tf->tf_a0);
-		break;
-
-	    /* Add stuff here */
- 
-	    default:
-		kprintf("Unknown syscall %d\n", callno);
-		err = ENOSYS;
-		break;
-	}
-
-
-	if (err) {
-		/*
-		 * Return the error code. This gets converted at
-		 * userlevel to a return value of -1 and the error
-		 * code in errno.
-		 */
-		tf->tf_v0 = err;
-		tf->tf_a3 = 1;      /* signal an error */
-	}
-	else {
-		/* Success. */
-		tf->tf_v0 = retval;
-		tf->tf_a3 = 0;      /* signal no error */
-	}
-	
-	/*
-	 * Now, advance the program counter, to avoid restarting
-	 * the syscall over and over again.
-	 */
-	
-	tf->tf_epc += 4;
-
-	/* Make sure the syscall code didn't forget to lower spl */
-	assert(curspl==0);
+  return copyout_failure;
+  
 }
 
-void
-md_forkentry(struct trapframe *tf)
-{
-	/*
-	 * This function is provided as a reminder. You need to write
-	 * both it and the code that calls it.
-	 *
-	 * Thus, you can trash it and do things another way if you prefer.
-	 */
+int sys_sleep( int sec){
+clocksleep(sec); return 0;
+}
 
-	(void)tf;
+int sys___time(time_t *seconds, time_t *nanoseconds, int32_t* return_value){
+  time_t s; u_int32_t ns;
+
+  gettime(&s, &ns);
+  int copyout_failure;
+  if(seconds==NULL && nanoseconds==NULL){
+    *return_value=s;
+
+    return 0;
+  }
+  if(seconds!=NULL){
+    copyout_failure = copyout( (const void *) &s , (userptr_t) seconds, sizeof(time_t));
+    if(copyout_failure!=0){
+    	*return_value=-1;
+
+    	return EFAULT;
+    }
+  }
+  if(nanoseconds!=NULL){
+    copyout_failure = copyout( (const void *) &ns , (userptr_t) nanoseconds, sizeof(u_int32_t));
+    if(copyout_failure!=0){
+
+    	*return_value=-1;
+    	return EFAULT;
+    }
+  }
+
+  (*return_value)=(int32_t)s;
+  return 0;
+}
+
+void mips_syscall(struct trapframe *tf) {
+  int callno;
+  int32_t retval;
+  int err;
+
+  assert(curspl == 0);
+
+  callno = tf->tf_v0;
+
+  /*
+   * Initialize retval to 0. Many of the system calls don't
+   * really return a value, just 0 for success and -1 on
+   * error. Since retval is the value returned on success,
+   * initialize it to 0 by default; thus it's not necessary to
+   * deal with it except for calls that return other values,
+   * like write.
+   */
+
+  retval = 0;
+
+  switch (callno) {
+  case SYS_reboot:
+    err = sys_reboot(tf->tf_a0);
+    break;
+  case SYS_write:
+    err = sys_write(tf->tf_a0,(const void *)tf->tf_a1,tf->tf_a2, &retval);
+    break;
+  case SYS___time:
+
+      err = sys___time((time_t *)tf->tf_a0,(time_t *)tf->tf_a1,&retval);
+    break;
+  case SYS_read:
+    err = sys_read(tf->tf_a0,(const void *)tf->tf_a1,tf->tf_a2, &retval);
+    break;
+  case SYS_sleep:
+    err = sys_sleep(tf->tf_a0);
+    break;
+  default:
+    kprintf("Unknown syscall %d\n", callno);
+    err = ENOSYS;
+    break;
+  }
+
+  if (err) {
+    /*
+     * Return the error code. This gets converted at
+     * userlevel to a return value of -1 and the error
+     * code in errno.
+     */
+    tf->tf_v0 = err;
+    tf->tf_a3 = 1; /* signal an error */
+  } else {
+    /* Success. */
+    tf->tf_v0 = retval;
+    tf->tf_a3 = 0; /* signal no error */
+  }
+
+  /*
+   * Now, advance the program counter, to avoid restarting
+   * the syscall over and over again.
+   */
+
+  tf->tf_epc += 4;
+
+  /* Make sure the syscall code didn't forget to lower spl */
+  assert(curspl == 0);
+}
+
+void md_forkentry(struct trapframe *tf) {
+  /*
+   * This function is provided as a reminder. You need to write
+   * both it and the code that calls it.
+   *
+   * Thus, you can trash it and do things another way if you prefer.
+   */
+
+  (void)tf;
 }

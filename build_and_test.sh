@@ -30,5 +30,4 @@ sed -i '0,/autoseed/s//seed=1/' sys161.conf
 cd ..
 cd build
 echo "$(date)" > ../os161/testlog  # Save current time to the file
-os161-tester 3 2>&1 | tee -a ../os161/testlog  # Run the command and append output to the file
-
+os161-tester 1  5 2>&1 | tee -a ../os161/testlog  # Run the command and append output to the file

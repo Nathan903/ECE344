@@ -1,6 +1,9 @@
-Sat Mar 16 19:08:59 UTC 2024
+Sat Mar 16 19:13:56 UTC 2024
 Warning: Permanently added 'ug71.eecg.utoronto.ca' (ED25519) to the list of known hosts.
-make[3]: *** No rule to make target 'depend'.  Stop.
-make[2]: *** [Makefile:24: tt.depend] Error 2
-make[1]: *** [Makefile:56: depend] Error 2
-make: *** [Makefile:26: all] Error 2
+Running 5 for Assignment 1
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst1-05-sleep.py
+sleep
+PASS
+Mark for sleep is 5 out of 5
+
+You received 5 marks out of 12
