@@ -1,3 +1,8 @@
-Sat Mar 16 00:22:19 EDT 2024
-Running all tests for Assignment 3
-Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-01-addtest.py
+Sat Mar 16 14:27:47 EDT 2024
+Running 4 for Assignment 1
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst1-04-timeit.py
+timeit
+PASS
+Mark for timeit is 9 out of 9
+
+You received 9 marks out of 12

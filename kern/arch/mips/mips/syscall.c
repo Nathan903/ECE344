@@ -1,11 +1,13 @@
 #include <types.h>
 #include <kern/errno.h>
 #include <lib.h>
+#include <clock.h>
 #include <machine/pcb.h>
 #include <machine/spl.h>
 #include <machine/trapframe.h>
 #include <kern/callno.h>
 #include <syscall.h>
+
 
 /*
  * System call handler.
@@ -43,6 +45,60 @@
  * (In fact, we recommend you don't use 64-bit quantities at all. See
  * arch/mips/include/types.h.)
  */
+#define ATOMIC_START int spl = splhigh()
+#define ATOMIC_END splx(spl) 
+int /*err*/ sys_write(int fd, const void* buf, size_t nbytes, int32_t* return_value){ 
+  if (!(fd==1 || fd==2)){
+    (*return_value)=-1;
+    return EBADF;
+  }
+  ATOMIC_START;
+  char* kernel_buffer = kmalloc(nbytes+1);
+  int copyin_failure= copyin(buf,(void *) kernel_buffer, nbytes); //0 on success, EFAULT if a memory
+  if(!copyin_failure) {
+    kernel_buffer[nbytes]='\0';
+    kprintf(kernel_buffer);
+    (*return_value)=nbytes;
+  } else{
+    (*return_value)=-1;
+  }
+
+  ATOMIC_END;
+  kfree((void *)kernel_buffer);
+  return copyin_failure;
+}
+
+
+int sys___time(time_t *seconds, time_t *nanoseconds, int32_t* return_value){
+  time_t s; u_int32_t ns;
+
+  gettime(&s, &ns);
+  int copyout_failure;
+  if(seconds==NULL && nanoseconds==NULL){
+    *return_value=s;
+
+    return 0;
+  }
+  if(seconds!=NULL){
+    copyout_failure = copyout( (const void *) &s , (userptr_t) seconds, sizeof(time_t));
+    if(copyout_failure!=0){
+    	*return_value=-1;
+
+    	return EFAULT;
+    }
+  }
+  if(nanoseconds!=NULL){
+    copyout_failure = copyout( (const void *) &ns , (userptr_t) nanoseconds, sizeof(u_int32_t));
+    if(copyout_failure!=0){
+
+    	*return_value=-1;
+    	return EFAULT;
+    }
+  }
+
+  (*return_value)=(int32_t)s;
+  return 0;
+}
 
 void mips_syscall(struct trapframe *tf) {
   int callno;
@@ -68,8 +124,13 @@ void mips_syscall(struct trapframe *tf) {
   case SYS_reboot:
     err = sys_reboot(tf->tf_a0);
     break;
+  case SYS_write:
+    err = sys_write(tf->tf_a0,(const void *)tf->tf_a1,tf->tf_a2, &retval);
+    break;
+  case SYS___time:
 
-    /* Add stuff here */
+      err = sys___time((time_t *)tf->tf_a0,(time_t *)tf->tf_a1,&retval);
+    break;
 
   default:
     kprintf("Unknown syscall %d\n", callno);
