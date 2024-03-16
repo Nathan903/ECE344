@@ -51,7 +51,7 @@ int /*err*/ sys_write(int fd, const void* buf, size_t nbytes, int32_t* return_va
   if (!(fd==1 || fd==2)){
     (*return_value)=-1;
     return EBADF;
-  }
+  } 
   ATOMIC_START;
   char* kernel_buffer = kmalloc(nbytes+1);
   int copyin_failure= copyin(buf,(void *) kernel_buffer, nbytes); //0 on success, EFAULT if a memory
@@ -67,7 +67,31 @@ int /*err*/ sys_write(int fd, const void* buf, size_t nbytes, int32_t* return_va
   kfree((void *)kernel_buffer);
   return copyin_failure;
 }
+int /*err*/ sys_read(int fd, const void* buf, size_t nbytes, int32_t* return_value ) { 
+  if (!(fd==0)){
+    (*return_value)=-1;
+    return EBADF;
+  }
+  if (nbytes!=1) {
+    (*return_value)=-1;
+    return EUNIMP;
+  }
+  ;
+  char input = getch();
+  int copyout_failure = copyout( (const void *) &input , (userptr_t) buf, sizeof(char));
+  if(!copyout_failure) {
+  (*return_value)=1;
+  } else{
+    (*return_value)=-1;
+  }
 
+  return copyout_failure;
+  
+}
+
+int sys_sleep( int sec){
+clocksleep(sec); return 0;
+}
 
 int sys___time(time_t *seconds, time_t *nanoseconds, int32_t* return_value){
   time_t s; u_int32_t ns;
@@ -131,7 +155,12 @@ void mips_syscall(struct trapframe *tf) {
 
       err = sys___time((time_t *)tf->tf_a0,(time_t *)tf->tf_a1,&retval);
     break;
-
+  case SYS_read:
+    err = sys_read(tf->tf_a0,(const void *)tf->tf_a1,tf->tf_a2, &retval);
+    break;
+  case SYS_sleep:
+    err = sys_sleep(tf->tf_a0);
+    break;
   default:
     kprintf("Unknown syscall %d\n", callno);
     err = ENOSYS;
