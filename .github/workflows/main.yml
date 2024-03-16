@@ -1,0 +1,43 @@
+name: Remote Submit
+
+on:
+  push:
+    branches: [ '*' ] # Trigger on push events for all branches
+
+
+jobs:
+  run_commands:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2        
+    - name: Configure SSH
+      run: |
+        mkdir -p ~/.ssh/
+        echo "$SSH_KEY" > ~/.ssh/staging.key
+        chmod 600 ~/.ssh/staging.key
+        cat >>~/.ssh/config <<END
+        Host staging
+          HostName $SSH_HOST
+          User $SSH_USER
+          IdentityFile ~/.ssh/staging.key
+          StrictHostKeyChecking no
+        END
+      env:
+        SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+        SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+        SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+    - name: Save current time
+      run: echo "$(date)" > tester3.txt
+    - name: Start the server
+      run: ssh staging 'cd ~/ece344/os161/; sh build_and_test.sh;' 2>&1 | tee -a tester3.txt
+    - name: Read log
+      run: echo "::set-output name=log::$(tail -n 1  tester3.txt)"
+      id: read_log
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "GitHub Action bot"
+        git config --global user.email "bot@nsa.gov"
+        git add tester3.txt
+        git commit -m "Auto-submit ${{ steps.read_log.outputs.log }}"
+        git push
