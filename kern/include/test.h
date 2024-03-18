@@ -46,5 +46,5 @@ void menu(char *argstr);
 
 /* Routine for running userlevel test code. */
 int runprogram(char *progname);
-
+int runprogram_with_args(char *progname,char ** args, unsigned long nargs);
 #endif /* _TEST_H_ */
