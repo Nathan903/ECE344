@@ -11,5 +11,13 @@
 struct thread;
 
 extern struct thread *curthread;
+extern int cur_max_pid;
+#define MAX_PID 65536
+struct pid_to_threadptr_node {
+    pid_t pid;
+    struct thread *threadptr; 
+};
+#define PID_TABLE_LEN 2000 
+extern struct pid_to_threadptr_node pid_to_threadptr[PID_TABLE_LEN];
 
 #endif /* _CURTHREAD_H_ */
