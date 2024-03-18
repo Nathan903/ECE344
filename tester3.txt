@@ -1,4 +1,4 @@
-Mon Mar 18 20:02:16 UTC 2024
+Mon Mar 18 20:59:36 UTC 2024
 Warning: Permanently added 'ug71.eecg.utoronto.ca' (ED25519) to the list of known hosts.
 Running all tests for Assignment 3
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-01-addtest.py
@@ -78,37 +78,47 @@ Mark for crash is 1 out of 13
 
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-06-badcall.py
 badcall
-TIMEOUT ERROR
+PASS
+PASS
+PASS
+END OF FILE ERROR
 FAIL
-TIMEOUT ERROR
+END OF FILE ERROR
 FAIL
-TIMEOUT ERROR
+END OF FILE ERROR
 FAIL
-TIMEOUT ERROR
+END OF FILE ERROR
 FAIL
-TIMEOUT ERROR
+END OF FILE ERROR
 FAIL
-TIMEOUT ERROR
+END OF FILE ERROR
 FAIL
-TIMEOUT ERROR
+END OF FILE ERROR
+END OF FILE ERROR
 FAIL
-TIMEOUT ERROR
+END OF FILE ERROR
 FAIL
-TIMEOUT ERROR
+END OF FILE ERROR
 FAIL
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-Mark for badcall is 12 out of 21
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+Mark for badcall is 3 out of 21
 
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-07-wait.py
 wait
@@ -122,24 +132,19 @@ Mark for wait is 18 out of 18
 
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-08-addexec.py
 addexec
-TIMEOUT ERROR
-FAIL
-Mark for addexec is 0 out of 10
+PASS
+Mark for addexec is 10 out of 10
 
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-09-facts.py
 facts
-TIMEOUT ERROR
-FAIL
-Mark for facts is 0 out of 22
+PASS
+Mark for facts is 22 out of 22
 
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-10-draw.py
 draw
-TIMEOUT ERROR
-FAIL
-TIMEOUT ERROR
-FAIL
-TIMEOUT ERROR
-FAIL
-Mark for draw is 0 out of 12
+PASS
+PASS
+PASS
+Mark for draw is 12 out of 12
 
-You received 65 marks out of 130
+You received 100 marks out of 130

@@ -10,6 +10,7 @@
 #include <thread.h>
 #include <curthread.h>
 #include <addrspace.h>
+#include <test.h>
 #define INVALID_IDX -69
 extern u_int32_t curkstack;
 /*
@@ -254,6 +255,74 @@ int sys_fork(struct trapframe* tf, int32_t* return_value){
   ATOMIC_END;
   return 0;
 }
+#define MAX_STR_LENGTH2 30//########
+#define MAX_ARG_LEN 30//########
+#define MAX_ARGS 15 //########
+
+#define CHECK_FAILURE(N) \
+    do { \
+        if (copyin_failure == EFAULT) { \
+            (*return_value) = -1; \
+            return EFAULT; \
+        } \
+        if (str_len >= (N)) { \
+            (*return_value) = -1; \
+            kprintf("\nEXEC STR TOO BIG\n"); \
+            return E2BIG; \
+        } \
+    } while(0)
+int sys_execv(const char *userland_program, char **userland_args, int32_t* return_value){
+  size_t str_len;
+  char program[MAX_STR_LENGTH2];
+  int j; for(j=0; j<MAX_STR_LENGTH2; j++)  program[j]='\0';
+  int copyin_failure= copyinstr(
+    (const void*) userland_program,
+    (void *) program, 
+    (size_t) MAX_STR_LENGTH2,
+    &str_len
+  ); 
+  CHECK_FAILURE(MAX_STR_LENGTH2);
+  //kprintf("%s \n",program);
+  
+  
+  char * args[MAX_ARGS];  
+  copyin_failure= copyin(
+    (const void*) userland_args,
+    (void *) args, 
+    (size_t) sizeof(char*)*MAX_ARGS
+  ); 
+  if(copyin_failure ==EFAULT){
+    (*return_value) = -1;
+    return EFAULT;
+  }
+  int argc; for (argc =0; argc<MAX_ARGS; argc++){
+	char * userland_argi = args[argc];
+        //kprintf("%p\n", args[argc]);
+	if(userland_argi==NULL){
+	  break;
+	}
+	args[argc] = kmalloc( sizeof(char)* MAX_ARG_LEN);
+	copyin_failure= copyinstr(
+          (const void*) userland_argi,
+          (void *) args[argc], 
+          (size_t) sizeof(char*)*MAX_STR_LENGTH2,
+          &str_len
+        );
+        CHECK_FAILURE(MAX_ARG_LEN);
+        //kprintf("%s\n", args[argc]);
+	
+  }
+  if(argc>=MAX_ARGS){
+    (*return_value) = -1;
+    return E2BIG;
+  }
+  runprogram_with_args(program, args, argc);
+
+  (*return_value) = -1;
+  //kprintf("EXEC SOMEHOW REUTRNED");
+  assert(1==2);
+  return 0;
+}
 void mips_syscall(struct trapframe *tf) {
   int callno;
   int32_t retval;
@@ -302,6 +371,9 @@ void mips_syscall(struct trapframe *tf) {
     break;
   case SYS_fork:
     err = sys_fork(tf, &retval );
+    break;
+  case SYS_execv:
+    err = sys_execv( (const char *)tf->tf_a0, (char **)tf->tf_a1, &retval );
     break;
   default:
     kprintf("Unknown syscall %d\n", callno);
