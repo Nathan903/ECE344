@@ -31,5 +31,5 @@ cd ..
 cd build
 echo "$(date)" > ../os161/testlog  # Save current time to the file
 #python3 test.py
-os161-tester 3  2>&1 | tee -a ../os161/testlog  # Run the command and append output to the file
+os161-tester 4  2>&1 | tee -a ../os161/testlog  # Run the command and append output to the file
 
