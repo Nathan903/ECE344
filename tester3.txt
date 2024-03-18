@@ -1,9 +1,171 @@
-Sat Mar 16 19:13:56 UTC 2024
+Mon Mar 18 06:56:37 UTC 2024
 Warning: Permanently added 'ug71.eecg.utoronto.ca' (ED25519) to the list of known hosts.
-Running 5 for Assignment 1
-Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst1-05-sleep.py
-sleep
-PASS
-Mark for sleep is 5 out of 5
+Running all tests for Assignment 3
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-01-addtest.py
+add
+END OF FILE ERROR
+FAIL
+Mark for add is 0 out of 5
 
-You received 5 marks out of 12
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-02-argtest.py
+argtest
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+Mark for argtest is 0 out of 6
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-03-forktest.py
+forktest
+END OF FILE ERROR
+FAIL
+Mark for forktest is 0 out of 15
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-04-forkbomb.py
+forkbomb
+FAIL
+Mark for forkbomb is 0 out of 8
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-05-crash.py
+crash
+PASS
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+Mark for crash is 1 out of 13
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-06-badcall.py
+badcall
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+Mark for badcall is 0 out of 21
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-07-wait.py
+wait
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+Mark for wait is 0 out of 18
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-08-addexec.py
+addexec
+END OF FILE ERROR
+FAIL
+Mark for addexec is 0 out of 10
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-09-facts.py
+facts
+END OF FILE ERROR
+FAIL
+Mark for facts is 0 out of 22
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-10-draw.py
+draw
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+FAIL
+Mark for draw is 0 out of 12
+
+You received 1 marks out of 130
