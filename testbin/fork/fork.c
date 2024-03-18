@@ -30,7 +30,10 @@ int
 dofork(void)
 {
 	int pid;
-	pid = fork();
+	
+	pid=fork();
+	printf("[%d] FORKING pid addr %p \n", getpid(), &pid);
+
 	if (pid < 0) {
 		warn("fork");
 	}
@@ -46,12 +49,21 @@ main(int argc, const char * argv[])
 	if (argc == 2) {
 	        n = atoi(argv[1]);
 	}
-
+	int cpid=0;
 	for (i = 0; i < n; ++i) {
-		if (dofork() == 0)
-		        return spin(500);
+		printf("[%d] START FORKING\n", getpid());
+		if ((cpid=dofork()) == 0){
+			printf("[%d] DONE FORKING CHILD\n", getpid());
+		        
+		        spin(500);
+		        _exit(69);
+		}
 	}
-	
+	printf("[%d] DONE FORKING PARENT\n", getpid());
+
+	int exitcode;
+	cpid=waitpid(cpid, &exitcode,0);
+	printf("[%d] DONE WAIT PARENT %d %d\n", getpid(),cpid,exitcode);
 	/* spin for a while and exit */
 	return spin(n*1000);
 }
