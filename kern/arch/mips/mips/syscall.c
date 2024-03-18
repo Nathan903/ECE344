@@ -9,7 +9,7 @@
 #include <syscall.h>
 #include <thread.h>
 #include <curthread.h>
-
+#include <addrspace.h>
 
 /*
  * System call handler.
@@ -47,6 +47,7 @@
  * (In fact, we recommend you don't use 64-bit quantities at all. See
  * arch/mips/include/types.h.)
  */
+ extern u_int32_t curkstack;
 #define ATOMIC_START int spl = splhigh()
 #define ATOMIC_END splx(spl) 
 int /*err*/ sys_write(int fd, const void* buf, size_t nbytes, int32_t* return_value){ 
@@ -101,14 +102,14 @@ int sys___time(time_t *seconds, time_t *nanoseconds, int32_t* return_value){
   gettime(&s, &ns);
   int copyout_failure;
   if(seconds==NULL && nanoseconds==NULL){
-    *return_value=s;
+    (*return_value)=s;
 
     return 0;
   }
   if(seconds!=NULL){
     copyout_failure = copyout( (const void *) &s , (userptr_t) seconds, sizeof(time_t));
     if(copyout_failure!=0){
-    	*return_value=-1;
+    	(*return_value)=-1;
 
     	return EFAULT;
     }
@@ -117,7 +118,7 @@ int sys___time(time_t *seconds, time_t *nanoseconds, int32_t* return_value){
     copyout_failure = copyout( (const void *) &ns , (userptr_t) nanoseconds, sizeof(u_int32_t));
     if(copyout_failure!=0){
 
-    	*return_value=-1;
+    	(*return_value)=-1;
     	return EFAULT;
     }
   }
@@ -132,9 +133,107 @@ int sys_getpid(int32_t* return_value){
 int sys__exit(int32_t exit_code){
   curthread->exit_code = exit_code;
   curthread->has_exited = 1;
+  thread_wakeup((void*) curthread->pid);
   thread_exit();
   return 0;
 }
+
+int sys_waitpid(pid_t pid, int *status, int options, int32_t* return_value){
+  if(options!=0 || pid<1 || pid>= cur_max_pid){
+    (*return_value) = -1;
+    return EINVAL;
+  }
+  ATOMIC_START;
+  kprintf("\nSTARTSLEEP\n");
+  thread_sleep((void*)pid);
+    kprintf("aaSTARTSLEEP");
+  // wakeup
+  int kernel_status= pid_to_threadptr[pid].threadptr->exit_code;
+  int copyout_failure = copyout( (const void *) &kernel_status, (userptr_t) status,sizeof(int));
+    ATOMIC_END;
+    if(copyout_failure!=0){
+    	(*return_value)=-1;
+    	return EFAULT;
+    }
+    (*return_value)=pid;
+    
+    return 0;
+
+
+}
+
+#define MYMASK 0xfffff000x	
+void md_forkentry(struct trapframe *tf, struct addrspace * new_as) {
+  /*
+   * This function is provided as a reminder. You need to write
+   * both it and the code that calls it.
+   *
+   * Thus, you can trash it and do things another way if you prefer.
+   */
+   as_activate(curthread-> t_vmspace);
+  kprintf("CHILDRUNNING\n");
+  struct trapframe new_tf;
+  struct trapframe *copied_tf =&new_tf;
+  if (copied_tf==0) {
+    (copied_tf->tf_a3 ) = -1;
+    // ########## TOO LATE
+  }
+  kprintf("made tf\n");
+
+  memcpy(copied_tf, tf, sizeof(struct trapframe));
+  kprintf("copied tf\n");
+  copied_tf->tf_v0 = 0;
+  copied_tf->tf_a3 = 0;
+  copied_tf->tf_epc +=4;
+  curthread->t_vmspace = new_as; 
+  curthread->pid = (cur_max_pid);
+  	int i;for(i=0; i<PID_TABLE_LEN ;i++){
+		if (pid_to_threadptr[i].pid==0){
+			pid_to_threadptr[i].pid =cur_max_pid;
+			pid_to_threadptr[i].threadptr=curthread;
+		        break;
+		}
+	} cur_max_pid++;
+
+
+
+   mips_usermode(copied_tf);
+}
+
+int sys_fork(struct trapframe* tf, int32_t* return_value){
+
+	kprintf("start forking\n");
+	kprintf("start start atomic\n");
+  ATOMIC_START;
+  kprintf("start atomic\n");
+  
+  
+  struct addrspace * new_as;
+  int result;
+  result =  as_copy(curthread -> t_vmspace, &new_as);
+  if (result!=0) {
+    (*return_value) = -1;
+    return ENOMEM;
+  }
+  
+  kprintf("copied as\n");
+  struct thread* child_thread;
+  struct trapframe * copied_tf = kmalloc(sizeof(struct trapframe));
+  memcpy(copied_tf, tf, sizeof(struct trapframe));
+  int t_result;
+  t_result =thread_fork((const char *) curthread->t_name, (void *) copied_tf, (unsigned long) new_as, (void (*)(void *, unsigned long) )md_forkentry, (struct thread **) &child_thread);
+ kprintf("forked\n");
+ kfree(copied_tf);
+  if (t_result!=0){
+
+  }
+
+  (*return_value) = (int32_t) child_thread->pid;
+  kprintf("done forking\n");
+  ATOMIC_END;
+  return 0;
+}
+
 void mips_syscall(struct trapframe *tf) {
   int callno;
   int32_t retval;
@@ -178,6 +277,12 @@ void mips_syscall(struct trapframe *tf) {
   case SYS__exit:
     err = sys__exit(tf->tf_a0);
     break;
+  case SYS_waitpid:
+    err = sys_waitpid((pid_t) tf->tf_a0, (int *) tf->tf_a1, (int) tf->tf_a2,&retval);
+    break;
+  case SYS_fork:
+    err = sys_fork(tf, &retval );
+    break;
   default:
     kprintf("Unknown syscall %d\n", callno);
     err = ENOSYS;
@@ -209,13 +314,3 @@ void mips_syscall(struct trapframe *tf) {
   assert(curspl == 0);
 }
 
-void md_forkentry(struct trapframe *tf) {
-  /*
-   * This function is provided as a reminder. You need to write
-   * both it and the code that calls it.
-   *
-   * Thus, you can trash it and do things another way if you prefer.
-   */
-
-  (void)tf;
-}

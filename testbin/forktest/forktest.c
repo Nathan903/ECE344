@@ -78,19 +78,30 @@ dowait(int nowait, int pid)
 		/* fork in question failed; just return */
 		return;
 	}
+	printf("EXIT");
 	if (pid==0) {
 		/* in the fork in question we were the child; exit */
 		exit(0);
 	}
-
+	printf("afterEXIT");
 	if (!nowait) {
+		printf("WAITSTART");
 		if (waitpid(pid, &x, 0)<0) {
+		printf("WAITddd");
+
 			warn("waitpid");
+
 		}
+
 		else if (x!=0) {
+		printf("WAITddddddRT");
+
 			warnx("pid %d: exit %d", pid, x);
+
 		}
+		printf("WAITddddddRdewedweT\n");
 	}
+		printf("dowaitdone1\n");
 }
 
 /*
@@ -108,10 +119,16 @@ test(int nowait)
 	 * It is unrolled to encourage gcc to registerize the pids,
 	 * to prevent wait/exit problems if fork corrupts memory.
 	 */
-
+	 printf("testbin1\n");
 	pid0 = dofork();
+	 printf("testbin2\n");
+
 	putchar('0');
+	 printf("testbin3\n");
+
 	check();
+	 printf("testbin4\n");
+
 	pid1 = dofork();
 	putchar('1');
 	check();
@@ -126,7 +143,11 @@ test(int nowait)
 	 * These must be called in reverse order to avoid waiting
 	 * improperly.
 	 */
+	 printf("testbinw0\n");
+ 
 	dowait(nowait, pid3);
+	 printf("afterdowait\n");
+
 	dowait(nowait, pid2);
 	dowait(nowait, pid1);
 	dowait(nowait, pid0);

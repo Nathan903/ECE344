@@ -262,6 +262,7 @@ thread_fork(const char *name,
 	    void (*func)(void *, unsigned long),
 	    struct thread **ret)
 {
+kprintf("start threadfork");
 	struct thread *newguy;
 	int s, result;
 
@@ -316,11 +317,14 @@ thread_fork(const char *name,
 		goto fail;
 	}
 
+kprintf("threadfork 1");
+
 	/* Make the new thread runnable */
 	result = make_runnable(newguy);
 	if (result != 0) {
 		goto fail;
 	}
+kprintf("threadfork 2");
 
 	/*
 	 * Increment the thread counter. This must be done atomically
@@ -329,9 +333,11 @@ thread_fork(const char *name,
 	 * existence.
 	 */
 	numthreads++;
+kprintf("threadfork 3");
 
 	/* Done with stuff that needs to be atomic */
 	splx(s);
+kprintf("threadfork 4");
 
 	/*
 	 * Return new thread structure if it's wanted.  Note that
@@ -342,6 +348,7 @@ thread_fork(const char *name,
 	if (ret != NULL) {
 		*ret = newguy;
 	}
+kprintf("threadfork 5");
 
 	return 0;
 
@@ -502,6 +509,7 @@ thread_exit(void)
 
 	assert(numthreads>0);
 	numthreads--;
+kprintf("exiting\n");
 	mi_switch(S_ZOMB);
 
 	panic("Thread came back from the dead!\n");
@@ -536,6 +544,7 @@ thread_yield(void)
 void
 thread_sleep(const void *addr)
 {
+
 	// may not sleep in an interrupt handler
 	assert(in_interrupt==0);
 	

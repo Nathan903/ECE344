@@ -235,6 +235,7 @@ mips_trap(struct trapframe *tf)
  * md_usermode is meant for use in exec and equivalent.
  * md_forkentry, in syscall.c, is meant for use in fork.
  */
+ #define MYMASK2 0xfffff000
 void
 mips_usermode(struct trapframe *tf)
 {
@@ -262,6 +263,7 @@ mips_usermode(struct trapframe *tf)
 	 * current thread's own stack. It cannot correctly be on either
 	 * another thread's stack or in the kernel heap. (Why?)
 	 */
+	   kprintf("MIPSUSER %p %p\n", (void*) (( (unsigned int) curkstack-1)&MYMASK2),  (void *)(( (unsigned int) tf)&MYMASK2));
 	assert(SAME_STACK(curkstack-1, (vaddr_t)tf));
 
 	/*

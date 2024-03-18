@@ -71,7 +71,8 @@ struct trapframe {
  * The trapframe must be on the thread's own stack or bad things will
  * happen.
  */
+ #include <addrspace.h>
 void mips_usermode(struct trapframe *tf);
-void md_forkentry(struct trapframe *tf);
+void md_forkentry(struct trapframe *tf, struct addrspace* new_as);
 
 #endif /* _MIPS_TRAPFRAME_H_ */

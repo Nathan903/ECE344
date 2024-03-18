@@ -1,72 +1,170 @@
-Sat Mar 16 16:15:04 EDT 2024
-Running all tests for Assignment 1
-Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst1-01-name.py
-name
-PASS
-Mark for name is 2 out of 2
+Sat Mar 16 19:27:28 EDT 2024
+Running all tests for Assignment 3
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-01-addtest.py
+add
+END OF FILE ERROR
+FAIL
+Mark for add is 0 out of 5
 
-Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst1-02-dbflags.py
-dbflags
-PASS
-PASS
-Turning on dbflags value foo
-PASS
-Turning bar dbflags value 2
-PASS
-Turning on dbflags value 13
-PASS
-Turning off dbflags value -2
-PASS
-Turning on dbflags value 1
-PASS
-Turning on dbflags value 5
-PASS
-Turning off dbflags value 1
-PASS
-Turning on dbflags value 6
-PASS
-Mark for dbflags is 10 out of 10
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-02-argtest.py
+argtest
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+Mark for argtest is 0 out of 6
 
-Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst1-03-exittest.py
-exittest
-PASS
-Mark for exittest is 5 out of 5
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-03-forktest.py
+forktest
+END OF FILE ERROR
+FAIL
+Mark for forktest is 0 out of 15
 
-Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst1-04-timeit.py
-timeit
-PASS
-Mark for timeit is 9 out of 9
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-04-forkbomb.py
+forkbomb
+FAIL
+Mark for forkbomb is 0 out of 8
 
-Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst1-05-sleep.py
-sleep
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-05-crash.py
+crash
 PASS
-Mark for sleep is 5 out of 5
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+Mark for crash is 1 out of 13
 
-Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst1-06-console.py
-console
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-PASS
-Mark for console is 15 out of 15
-
-Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst1-07-badcall.py
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-06-badcall.py
 badcall
-PASS
-PASS
-PASS
-PASS
-Mark for badcall is 4 out of 4
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+Mark for badcall is 0 out of 21
 
-You received 50 marks out of 12
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-07-wait.py
+wait
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+END OF FILE ERROR
+FAIL
+Mark for wait is 0 out of 18
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-08-addexec.py
+addexec
+END OF FILE ERROR
+FAIL
+Mark for addexec is 0 out of 10
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-09-facts.py
+facts
+END OF FILE ERROR
+FAIL
+Mark for facts is 0 out of 22
+
+Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-10-draw.py
+draw
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+FAIL
+OS HAS CRASHED
+END OF FILE ERROR
+FAIL
+Mark for draw is 0 out of 12
+
+You received 1 marks out of 130
