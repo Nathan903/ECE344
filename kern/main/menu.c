@@ -66,10 +66,15 @@ cmd_progthread(void *ptr, unsigned long nargs)
 
 	/* Hope we fit. */
 	assert(strlen(args[0]) < sizeof(progname));
-
+	
 	strcpy(progname, args[0]);
-
-	result = runprogram(progname);
+	/*###############
+	kprintf("\n running %s", progname);
+	unsigned long i;for(i=0; i<nargs;i++){
+	kprintf(" %s ", args[i]);
+	} kprintf("\n");
+	*/
+	result = runprogram_with_args(progname, args, nargs);
 	if (result) {
 		kprintf("Running program %s failed: %s\n", args[0],
 			strerror(result));
