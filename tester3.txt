@@ -1,4 +1,4 @@
-Mon Mar 18 22:40:06 UTC 2024
+Mon Mar 18 22:59:51 UTC 2024
 Warning: Permanently added 'ug71.eecg.utoronto.ca' (ED25519) to the list of known hosts.
 Running all tests for Assignment 3
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-01-addtest.py
@@ -26,55 +26,19 @@ Mark for forkbomb is 8 out of 8
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-05-crash.py
 crash
 PASS
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-OS HAS CRASHED
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-Mark for crash is 1 out of 13
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+Mark for crash is 13 out of 13
 
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-06-badcall.py
 badcall
@@ -128,4 +92,4 @@ PASS
 PASS
 Mark for draw is 12 out of 12
 
-You received 118 marks out of 130
+You received 130 marks out of 130
