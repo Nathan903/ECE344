@@ -101,14 +101,14 @@ int sys___time(time_t *seconds, time_t *nanoseconds, int32_t* return_value){
   gettime(&s, &ns);
   int copyout_failure;
   if(seconds==NULL && nanoseconds==NULL){
-    *return_value=s;
+    (*return_value)=s;
 
     return 0;
   }
   if(seconds!=NULL){
     copyout_failure = copyout( (const void *) &s , (userptr_t) seconds, sizeof(time_t));
     if(copyout_failure!=0){
-    	*return_value=-1;
+    	(*return_value)=-1;
 
     	return EFAULT;
     }
@@ -117,7 +117,7 @@ int sys___time(time_t *seconds, time_t *nanoseconds, int32_t* return_value){
     copyout_failure = copyout( (const void *) &ns , (userptr_t) nanoseconds, sizeof(u_int32_t));
     if(copyout_failure!=0){
 
-    	*return_value=-1;
+    	(*return_value)=-1;
     	return EFAULT;
     }
   }
@@ -132,9 +132,30 @@ int sys_getpid(int32_t* return_value){
 int sys__exit(int32_t exit_code){
   curthread->exit_code = exit_code;
   curthread->has_exited = 1;
+  thread_wakeup((void*) curthread->pid);
   thread_exit();
   return 0;
 }
+int sys_waitpid(pid_t pid, int *status, int options, int32_t* return_value){
+  if(options!=0 || pid<1 || pid>= cur_max_pid){
+    (*return_value) = -1;
+    return EINVAL;
+  }
+  ATOMIC_START;
+  thread_sleep((void*)pid);
+  // wakeup
+  int kernel_status= pid_to_threadptr[pid].threadptr->exit_code;
+  int copyout_failure = copyout( (const void *) &kernel_status, (userptr_t) status,sizeof(int));
+    ATOMIC_END;
+    if(copyout_failure!=0){
+      (*return_value)=-1;
+      return EFAULT;
+    }
+    (*return_value)=pid;
+
+    return 0;
+}
+
 void mips_syscall(struct trapframe *tf) {
   int callno;
   int32_t retval;
@@ -178,6 +199,12 @@ void mips_syscall(struct trapframe *tf) {
   case SYS__exit:
     err = sys__exit(tf->tf_a0);
     break;
+  case SYS_waitpid:
+    err = sys_waitpid((pid_t) tf->tf_a0, (int *) tf->tf_a1, (int) tf->tf_a2,&retval);
+    break;
+  // case SYS_fork:
+  //   err = sys_fork(tf, &retval );
+  //   break;
   default:
     kprintf("Unknown syscall %d\n", callno);
     err = ENOSYS;
