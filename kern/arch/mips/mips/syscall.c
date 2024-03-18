@@ -132,7 +132,10 @@ int sys_getpid(int32_t* return_value){
 int sys__exit(int32_t exit_code){
   curthread->exit_code = exit_code;
   curthread->has_exited = 1;
+  ATOMIC_START;
   thread_wakeup((void*) curthread->pid);
+  ATOMIC_END;
+  
   thread_exit();
   return 0;
 }
