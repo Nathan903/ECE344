@@ -74,7 +74,7 @@ runprogram(char *progname)
 	panic("md_usermode returned\n");
 	return EINVAL;
 }
-#define MAX_STR_LENGTH 100
+#define MAX_STR_LENGTH 100 //########
 #define NOT_VALID_STR 69
 
 int strnlen(const char *s){
@@ -99,6 +99,10 @@ int runprogram_with_args(char *progname,char ** args, unsigned long nargs){
   }
 
   /* We should be a new thread. */
+  if(curthread->t_vmspace!=NULL){
+    as_destroy(curthread->t_vmspace);
+    curthread->t_vmspace=NULL;
+  }
   assert(curthread->t_vmspace == NULL);
 
   /* Create a new address space. */
@@ -175,7 +179,8 @@ int runprogram_with_args(char *progname,char ** args, unsigned long nargs){
   copyout( (const void *)(lengths), (userptr_t)stackptr, (size_t) ((nargs + 1) * sizeof(vaddr_t)));
   //kprintf("%x\n", stackptr);
   
-  
+  kfree(args_copy);
+  kfree(lengths);
   /* Warp to user mode. */
   md_usermode(
     (int) nargs, //argc
