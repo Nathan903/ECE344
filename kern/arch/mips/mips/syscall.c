@@ -188,7 +188,7 @@ int sys_waitpid(pid_t pid, int *status, int options, int32_t* return_value){
   //destory child from table
   pid_to_threadptr[child_idx].pid = 0;
   pid_to_threadptr[child_idx].has_exited= 0;
-
+  
   int copyout_failure; copyout_failure = copyout( (const void *) &kernel_status, (userptr_t) status,sizeof(int));
     ATOMIC_END;
     if(copyout_failure!=0){
@@ -265,13 +265,23 @@ int sys_fork(struct trapframe* tf, int32_t* return_value){
             (*return_value) = -1; \
             return EFAULT; \
         } \
-        if (str_len >= (N)) { \
+        if (str_len >= (N) ) { \
             (*return_value) = -1; \
             kprintf("\nEXEC STR TOO BIG\n"); \
             return E2BIG; \
         } \
+        if (str_len <=1) { \
+            (*return_value) = -1; \
+            return EINVAL; \
+        } \
     } while(0)
 int sys_execv(const char *userland_program, char **userland_args, int32_t* return_value){
+
+  if(userland_program==NULL || userland_args==NULL){
+    (*return_value) = -1;
+    return EFAULT;
+  
+  }
   size_t str_len;
   char program[MAX_STR_LENGTH2];
   int j; for(j=0; j<MAX_STR_LENGTH2; j++)  program[j]='\0';
@@ -283,7 +293,8 @@ int sys_execv(const char *userland_program, char **userland_args, int32_t* retur
   ); 
   CHECK_FAILURE(MAX_STR_LENGTH2);
   //kprintf("%s \n",program);
-  
+
+  //kprintf("\tprogram:%s strlen:%d\n",program, str_len);
   
   char * args[MAX_ARGS];  
   copyin_failure= copyin(
@@ -295,6 +306,7 @@ int sys_execv(const char *userland_program, char **userland_args, int32_t* retur
     (*return_value) = -1;
     return EFAULT;
   }
+
   int argc; for (argc =0; argc<MAX_ARGS; argc++){
 	char * userland_argi = args[argc];
         //kprintf("%p\n", args[argc]);
@@ -316,6 +328,7 @@ int sys_execv(const char *userland_program, char **userland_args, int32_t* retur
     (*return_value) = -1;
     return E2BIG;
   }
+  //kprintf("\tprogram:%s argc:%d\n",program, argc);
   runprogram_with_args(program, args, argc);
 
   (*return_value) = -1;
