@@ -30,7 +30,7 @@ static const char *const trapcodenames[NTRAPCODES] = {
 	"Coprocessor unusable",
 	"Arithmetic overflow",
 };
-
+int sys__exit(int32_t exit_code);
 /*
  * Function called when user-level code hits a fatal fault.
  */
@@ -41,6 +41,8 @@ kill_curthread(u_int32_t epc, unsigned code, u_int32_t vaddr)
 	assert(code<NTRAPCODES);
 	kprintf("Fatal user mode trap %u (%s, epc 0x%x, vaddr 0x%x)\n",
 		code, trapcodenames[code], epc, vaddr);
+	//kprintf("KILLING BAD PROCESS %d\n",thread_count() );	
+	sys__exit(1);
 
 	/*
 	 * You will probably want to change this.
