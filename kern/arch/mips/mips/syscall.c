@@ -188,7 +188,7 @@ int sys_waitpid(pid_t pid, int *status, int options, int32_t* return_value){
   //destory child from table
   pid_to_threadptr[child_idx].pid = 0;
   pid_to_threadptr[child_idx].has_exited= 0;
-
+  
   int copyout_failure; copyout_failure = copyout( (const void *) &kernel_status, (userptr_t) status,sizeof(int));
     ATOMIC_END;
     if(copyout_failure!=0){

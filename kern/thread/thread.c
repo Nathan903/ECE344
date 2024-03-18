@@ -359,6 +359,7 @@ thread_fork(const char *name,
 	return result;
 }
 
+int sys_waitpid(pid_t pid, int *status, int options, int32_t* return_value);
 /*
  * Suspend execution of curthread until thread terminates. 
  * Return zero on success, EDEADLK if deadlock would occur.
@@ -366,9 +367,10 @@ thread_fork(const char *name,
 int thread_join(struct thread * thread)
 {
         // Replace this
-        clocksleep(5);
-        
-        (void)thread;  // suppress warning until code gets written
+        //clocksleep(5);
+        int32_t trash, trash2;
+        sys_waitpid(thread->pid, &trash2,0,&trash);
+        //(void)thread;  // suppress warning until code gets written
         return 0;
 }
 
