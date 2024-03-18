@@ -1,4 +1,4 @@
-Mon Mar 18 21:43:16 UTC 2024
+Mon Mar 18 22:28:40 UTC 2024
 Warning: Permanently added 'ug71.eecg.utoronto.ca' (ED25519) to the list of known hosts.
 Running all tests for Assignment 3
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-01-addtest.py
@@ -81,44 +81,25 @@ badcall
 PASS
 PASS
 PASS
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-END OF FILE ERROR
-FAIL
-Mark for badcall is 3 out of 21
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+PASS
+Mark for badcall is 21 out of 21
 
 Running: /nfs/ug/cad/cad2/ece344s/tester/scripts/asst3-07-wait.py
 wait
@@ -147,4 +128,4 @@ PASS
 PASS
 Mark for draw is 12 out of 12
 
-You received 100 marks out of 130
+You received 118 marks out of 130
