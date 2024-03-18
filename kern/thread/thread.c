@@ -79,13 +79,14 @@ thread_create(const char *name)
 	for(i=0; i<PID_TABLE_LEN ;i++){
 		if (pid_to_threadptr[i].pid==0){
 			pid_to_threadptr[i].pid =cur_max_pid;
-			pid_to_threadptr[i].threadptr=thread;
+			pid_to_threadptr[i].parent_thread=curthread;
 		        break;
 		}
 	}
 	
 	cur_max_pid++;
 	if(cur_max_pid== MAX_PID){ //freeze!
+	   kprintf("\nFREEZE\n");
 	   splhigh(); while(1){}
 	}
 	return thread;
@@ -101,6 +102,7 @@ static
 void
 thread_destroy(struct thread *thread)
 {
+	//kprintf("DESTROYING %d\n", thread->pid);
 	assert(thread != curthread);
 
 	// If you add things to the thread structure, be sure to dispose of

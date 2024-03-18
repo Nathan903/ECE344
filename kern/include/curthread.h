@@ -15,7 +15,9 @@ extern int cur_max_pid;
 #define MAX_PID 65536
 struct pid_to_threadptr_node {
     pid_t pid;
-    struct thread *threadptr; 
+    struct thread *parent_thread; 
+    int exit_code;
+    char has_exited;
 };
 #define PID_TABLE_LEN 2000 
 extern struct pid_to_threadptr_node pid_to_threadptr[PID_TABLE_LEN];

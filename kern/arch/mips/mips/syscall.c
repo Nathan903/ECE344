@@ -9,8 +9,9 @@
 #include <syscall.h>
 #include <thread.h>
 #include <curthread.h>
-
-
+#include <addrspace.h>
+#define INVALID_IDX -69
+extern u_int32_t curkstack;
 /*
  * System call handler.
  *
@@ -132,6 +133,14 @@ int sys_getpid(int32_t* return_value){
 int sys__exit(int32_t exit_code){
   curthread->exit_code = exit_code;
   curthread->has_exited = 1;
+  
+  int i;for(i=0; i<PID_TABLE_LEN ;i++){
+    if(pid_to_threadptr[i].pid==curthread->pid){
+      pid_to_threadptr[i].exit_code=exit_code;
+      pid_to_threadptr[i].has_exited=curthread->pid+69;
+      break;
+    }
+  }
   ATOMIC_START;
   thread_wakeup((void*) curthread->pid);
   ATOMIC_END;
@@ -144,21 +153,107 @@ int sys_waitpid(pid_t pid, int *status, int options, int32_t* return_value){
     (*return_value) = -1;
     return EINVAL;
   }
+  int kernel_status;
+  int child_idx = INVALID_IDX;
   ATOMIC_START;
-  thread_sleep((void*)pid);
-  // wakeup
-  int kernel_status= pid_to_threadptr[pid].threadptr->exit_code;
-  int copyout_failure = copyout( (const void *) &kernel_status, (userptr_t) status,sizeof(int));
+
+  int i;for(i=0; i<PID_TABLE_LEN ;i++){
+    if (pid_to_threadptr[i].pid==pid ){
+      child_idx = i; break;
+    }
+  }
+  
+  if (child_idx == INVALID_IDX){
+    (* return_value)=-1;
+    //kprintf("\nCHILD DIED\n");
+    ATOMIC_END;
+    return EINVAL;
+  }
+  if(pid_to_threadptr[child_idx].parent_thread != curthread){
+    (* return_value)=-1;
+    //kprintf("\nNO PERMISSION\n");
+    ATOMIC_END;
+    return EINVAL;
+  
+  }
+  //kprintf("\nCHILD alive %d %d %d\n",pid_to_threadptr[child_idx].has_exited, pid, child_idx);
+    
+  while(pid_to_threadptr[child_idx].has_exited==0){
+    thread_sleep((void*)pid);
+  }
+  //kprintf("\nCHILD just died\n");
+  
+  kernel_status = pid_to_threadptr[child_idx].exit_code;
+  //destory child from table
+  pid_to_threadptr[child_idx].pid = 0;
+  pid_to_threadptr[child_idx].has_exited= 0;
+
+  int copyout_failure; copyout_failure = copyout( (const void *) &kernel_status, (userptr_t) status,sizeof(int));
     ATOMIC_END;
     if(copyout_failure!=0){
       (*return_value)=-1;
       return EFAULT;
     }
     (*return_value)=pid;
-
     return 0;
 }
 
+void md_forkentry2(struct trapframe *tf, struct addrspace * parent_as) {
+
+  struct trapframe new_tf;
+  memcpy(&new_tf, tf, sizeof(struct trapframe));
+  // kprintf("made tf\n");
+  // kprintf("copied tf\n");
+  new_tf.tf_a3 = 0;
+  new_tf.tf_v0 = 0;
+  new_tf.tf_epc +=4;
+  // kprintf("curthread [%p] \n", curthread);
+  curthread->t_vmspace = parent_as; 
+  as_activate(parent_as);
+  assert(curthread->pid <=cur_max_pid);
+  // int i;for(i=0; i<PID_TABLE_LEN ;i++){
+  //   if (pid_to_threadptr[i].pid==0){
+  //     pid_to_threadptr[i].pid =cur_max_pid;
+  //     pid_to_threadptr[i].threadptr=curthread;
+  //     break;
+  //   }
+  // } cur_max_pid++;
+  kfree(tf); // THIS MUST BE IN CHILD, CUZ PARENT MIGHT FREE IT TOO EARLY
+  mips_usermode(&new_tf);
+  assert(1==2);
+  
+}
+
+int sys_fork(struct trapframe* tf, int32_t* return_value){
+
+  // kprintf("start forking\n");
+  ATOMIC_START;
+  struct addrspace * new_as;
+  int result; result = as_copy(curthread -> t_vmspace, &new_as);
+  if (result!=0) {
+    (*return_value) = -1;
+    ATOMIC_END;
+    return ENOMEM;
+  }
+
+  // kprintf("copied as\n");
+  struct thread* child_thread /*##*/=NULL;
+  struct trapframe * copied_tf = kmalloc(sizeof(struct trapframe));
+  memcpy(copied_tf, tf, sizeof(struct trapframe));
+  // kprintf("parent curthread [%p] \n", curthread);
+  int t_result; t_result =thread_fork("a", (void *) copied_tf, (unsigned long) new_as, (void (*)(void *, unsigned long) )md_forkentry2, &child_thread);
+  // kprintf("forked\n");
+  // kprintf("parent curthread [%p] \n", curthread);
+
+  if (t_result!=0){
+    kprintf("\nFORK BAD!\n");
+    ATOMIC_END;
+  }
+  (*return_value) = (int32_t) child_thread->pid;
+
+  ATOMIC_END;
+  return 0;
+}
 void mips_syscall(struct trapframe *tf) {
   int callno;
   int32_t retval;
@@ -205,9 +300,9 @@ void mips_syscall(struct trapframe *tf) {
   case SYS_waitpid:
     err = sys_waitpid((pid_t) tf->tf_a0, (int *) tf->tf_a1, (int) tf->tf_a2,&retval);
     break;
-  // case SYS_fork:
-  //   err = sys_fork(tf, &retval );
-  //   break;
+  case SYS_fork:
+    err = sys_fork(tf, &retval );
+    break;
   default:
     kprintf("Unknown syscall %d\n", callno);
     err = ENOSYS;
