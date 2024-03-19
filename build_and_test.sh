@@ -16,20 +16,20 @@ cd ~/ece344/os161
 make > /dev/null
 cd ~/ece344/os161
 cd kern/conf
-./config ASST3 > /dev/null
+./config ASST4 > /dev/null
 
 cd ~/ece344/os161/kern
-cd compile/ASST3
+cd compile/ASST4
 make depend > /dev/null
 make > /dev/null
 make install > /dev/null
 
 cd ~/ece344/build
-cp /cad2/ece344s/tester/sysconfig/sys161-asst3.conf sys161.conf
+cp /cad2/ece344s/tester/sysconfig/sys161-asst4.conf sys161.conf
 sed -i '0,/autoseed/s//seed=1/' sys161.conf
 cd ..
 cd build
 echo "$(date)" > ../os161/testlog  # Save current time to the file
 #python3 test.py
-os161-tester 3  2>&1 | tee -a ../os161/testlog  # Run the command and append output to the file
+os161-tester 4  #2>&1 | tee -a ../os161/testlog  # Run the command and append output to the file
 
