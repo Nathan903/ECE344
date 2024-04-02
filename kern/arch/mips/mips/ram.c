@@ -41,11 +41,6 @@ void ram_bootstrap(void) {
 	kprintf("%uk physical memory available\n", 
 		(lastpaddr-firstpaddr)/1024);
 
-    // Print the values returned by ram_getsize
-    u_int32_t lo, hi;
-    ram_getsize(&lo, &hi);
-    kprintf("ram_getsize: lo = %u, hi = %u\n", lo, hi);
-
 }
 
 /*
