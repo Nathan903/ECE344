@@ -8,13 +8,6 @@
 #include <machine/spl.h>
 #include <machine/tlb.h>
 
-/*
- * Dumb MIPS-only "VM system" that is intended to only be just barely
- * enough to struggle off the ground. You should replace all of this
- * code while doing the VM assignment. In fact, starting in that
- * assignment, this file is not included in your kernel!
- */
-
 /* under dumbvm, always have 48k of user stack */
 #define DUMBVM_STACKPAGES    12
 

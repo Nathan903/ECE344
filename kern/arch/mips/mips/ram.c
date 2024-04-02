@@ -12,9 +12,7 @@ static u_int32_t lastpaddr;   /* one past end of last free physical page */
  * Called very early in system boot to figure out how much physical
  * RAM is available.
  */
-void
-ram_bootstrap(void)
-{
+void ram_bootstrap(void) {
 	u_int32_t ramsize;
 	
 	/* Get size of RAM. */
@@ -42,6 +40,12 @@ ram_bootstrap(void)
 	kprintf("Cpu is MIPS r2000/r3000\n");
 	kprintf("%uk physical memory available\n", 
 		(lastpaddr-firstpaddr)/1024);
+
+    // Print the values returned by ram_getsize
+    u_int32_t lo, hi;
+    ram_getsize(&lo, &hi);
+    kprintf("ram_getsize: lo = %u, hi = %u\n", lo, hi);
+
 }
 
 /*
@@ -60,9 +64,7 @@ ram_bootstrap(void)
  * This function should not be called once the VM system is initialized, 
  * so it is not synchronized.
  */
-paddr_t
-ram_stealmem(unsigned long npages)
-{
+paddr_t ram_stealmem(unsigned long npages) {
 	u_int32_t size = npages * PAGE_SIZE;
 	u_int32_t paddr;
 
@@ -81,9 +83,7 @@ ram_stealmem(unsigned long npages)
  * initializes in order to find out what memory it has available to
  * manage.
  */
-void
-ram_getsize(u_int32_t *lo, u_int32_t *hi)
-{
+void ram_getsize(u_int32_t *lo, u_int32_t *hi) {
 	*lo = firstpaddr;
 	*hi = lastpaddr;
 	firstpaddr = lastpaddr = 0;
