@@ -5,8 +5,8 @@
 
 u_int32_t firstfree;   /* first free virtual address; set by start.S */
 
-static u_int32_t firstpaddr;  /* address of first free physical page */
-static u_int32_t lastpaddr;   /* one past end of last free physical page */
+u_int32_t firstpaddr;  /* address of first free physical page */
+u_int32_t lastpaddr;   /* one past end of last free physical page */
 
 /*
  * Called very early in system boot to figure out how much physical

@@ -11,9 +11,26 @@
 /* under dumbvm, always have 48k of user stack */
 #define DUMBVM_STACKPAGES    12
 
-void vm_bootstrap(void) { /* Do nothing. */ }
+typedef struct{
+  char state;
+  pid_t pid;
+} coremap_entry;
+#define FREE_STATE 0
+#define FIXED_STATE 1
+#define DIRTY_STATE 2
+#define CLEAN_STATE 3
+coremap_entry coremap[71];
+
+extern u_int32_t firstfree;   /* first free virtual address; set by start.S */
+extern u_int32_t firstpaddr;  /* address of first free physical page */
+extern u_int32_t lastpaddr;   /* one past end of last free physical page */
+
+void vm_bootstrap(void) { 
+  kprintf("vm_bootstrap: firstaddr%u lastaddr%u firstfree%u freesize:%uK\n",firstpaddr, lastpaddr, firstfree, (lastpaddr-firstpaddr)/1024);
+}
 
 static paddr_t getppages(unsigned long npages) {
+  
   int spl;
   paddr_t addr;
 
@@ -27,6 +44,7 @@ static paddr_t getppages(unsigned long npages) {
 
 /* Allocate/free some kernel-space virtual pages */
 vaddr_t alloc_kpages(int npages) {
+  kprintf("[alloc_kpages] %d\n",npages);
   paddr_t pa;
   pa = getppages(npages);
   if (pa == 0) {
