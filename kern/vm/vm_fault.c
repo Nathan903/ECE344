@@ -57,7 +57,7 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
     paddr = (faultaddress - vbase1) + as->as_pbase1;
   // } else if ( faultaddress >= stackbase && faultaddress < stacktop) {
   //   paddr = (faultaddress - stackbase) + as->as_stackpbase;
-  } else if ( (faultaddress >= vbase2 && faultaddress < vtop2) || ( faultaddress >= stackbase && faultaddress < stacktop) ) {
+  } else if ( (faultaddress >= vbase2 && faultaddress < vtop2) || ( faultaddress >= stackbase && faultaddress < stacktop) || (faultaddress >= as->heap_start && faultaddress < as->heap_end) ) {
     unsigned int i=0; for(i=0; i<PT_LENGTH;i++){
       if(as->pagetable[i].va==faultaddress){break;}
     }
@@ -74,9 +74,12 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
       }
     }
     // paddr = (faultaddress - vbase2) + as->as_pbase2;
+  } else if (( faultaddress >= stackbase-PAGE_SIZE && faultaddress < stacktop)){
+    rp("infiniterecursion...");
+    splx(spl); return EFAULT;
   } else {
     splx(spl);
-    DEBUG(DB_VM, "\x1b[31m\n[vmfault]EFAULT 0x%x\n\x1b[0m",faultaddress);
+    rp("\x1b[31m\n[vmfault]EFAULT\x1b[0m");kprintf("0x%x\n",faultaddress);
     return EFAULT;
   }
 

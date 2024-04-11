@@ -336,6 +336,21 @@ int sys_execv(const char *userland_program, char **userland_args, int32_t* retur
   assert(1==2);
   return 0;
 }
+intptr_t roundup(intptr_t num) {
+  if(num<0){return num-(num%4);}
+  return num + (4 - num % 4) % 4;
+}
+int sys_sbrk( intptr_t sz,  int32_t* return_value){
+  (*return_value) = curthread->t_vmspace->heap_end;
+  vaddr_t new_heapend = roundup(sz)+  curthread->t_vmspace->heap_end;
+  if(new_heapend<curthread->t_vmspace->heap_start){
+    (*return_value)=-1;return EINVAL;
+  } if( new_heapend> (curthread->t_vmspace->heap_start+PAGE_SIZE*40) ) {
+    (*return_value)=-1;return ENOMEM;
+  }
+  curthread->t_vmspace->heap_end = new_heapend;
+  return 0;
+}
 void mips_syscall(struct trapframe *tf) {
   int callno;
   int32_t retval;
@@ -387,6 +402,9 @@ void mips_syscall(struct trapframe *tf) {
     break;
   case SYS_execv:
     err = sys_execv( (const char *)tf->tf_a0, (char **)tf->tf_a1, &retval );
+    break;
+ case SYS_sbrk:
+    err = sys_sbrk( (intptr_t) tf->tf_a0, &retval );
     break;
   default:
     kprintf("Unknown syscall %d\n", callno);

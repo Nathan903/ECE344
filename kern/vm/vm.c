@@ -9,7 +9,7 @@
 #include <machine/tlb.h>
 
 /* under dumbvm, always have 48k of user stack */
-#define DUMBVM_STACKPAGES    70
+#define DUMBVM_STACKPAGES    30
 
 #define nullptr '\0'
 extern u_int32_t firstfree;   /* first free virtual address; set by start.S */

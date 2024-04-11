@@ -35,6 +35,8 @@ struct addrspace {
 	// paddr_t as_pbase2;
     struct pte pagetable[PT_LENGTH];
 	size_t as_npages2;
+    vaddr_t heap_start;
+    vaddr_t heap_end;
 	// paddr_t as_stackpbase;
 	//###################################
 	

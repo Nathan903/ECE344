@@ -104,7 +104,7 @@ void as_activate(struct addrspace *as) {
  */
 int as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz, int readable, int writeable, int executable) {
   //////////////////////START//////////////////////////
-  rp("as_define_region"); kprintf("%x %u\n", vaddr, sz);
+  rp("as_define_region"); kprintf("%x %u r%d w%d e%d\n", vaddr, sz,readable,writeable,executable);
   size_t npages;
 
   /* Align the region. First, the base... */
@@ -124,6 +124,9 @@ int as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz, int readabl
   if (as->as_vbase1 == 0) {
     as->as_vbase1 = vaddr;
     as->as_npages1 = npages;
+    as->heap_start = vaddr+ PAGE_SIZE*npages;
+    as->heap_end = vaddr+ PAGE_SIZE*npages;
+    
     return 0;
   }
 
