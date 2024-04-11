@@ -9,7 +9,7 @@
 #include <machine/tlb.h>
 
 /* under dumbvm, always have 48k of user stack */
-#define DUMBVM_STACKPAGES    12
+#define DUMBVM_STACKPAGES    70
 
 #define nullptr '\0'
 extern u_int32_t firstfree;   /* first free virtual address; set by start.S */
@@ -24,6 +24,10 @@ void vm_bootstrap(void) {
 }
 
 static paddr_t getppages(unsigned long npages) {
+  if (npages>20){
+    rp("getppageBIG"); kprintf("%ld\n",npages);
+    npages=20;
+  }
   int spl;int pagei;
   spl = splhigh();
   /////////////////////////////  

@@ -35,14 +35,14 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
   assert(as->as_pbase1 != 0);
   assert(as->as_npages1 != 0);
   assert(as->as_vbase2 != 0);
-  assert(as->as_pbase2 != 0);
+  // assert(as->as_pbase2 != 0);
   assert(as->as_npages2 != 0);
-  assert(as->as_stackpbase != 0);
+  // assert(as->as_stackpbase != 0);
   assert((as->as_vbase1 & PAGE_FRAME) == as->as_vbase1);
   assert((as->as_pbase1 & PAGE_FRAME) == as->as_pbase1);
   assert((as->as_vbase2 & PAGE_FRAME) == as->as_vbase2);
-  assert((as->as_pbase2 & PAGE_FRAME) == as->as_pbase2);
-  assert((as->as_stackpbase & PAGE_FRAME) == as->as_stackpbase);
+  // assert((as->as_pbase2 & PAGE_FRAME) == as->as_pbase2);
+  // assert((as->as_stackpbase & PAGE_FRAME) == as->as_stackpbase);
 
 
 
@@ -55,14 +55,28 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
   //kprintf("0x%x 0x%x 0x%x 0x%x  0x%x 0x%x\n", vbase1, vtop1, vbase2, vtop2, stackbase, stacktop);
   if (faultaddress >= vbase1 && faultaddress < vtop1) {
     paddr = (faultaddress - vbase1) + as->as_pbase1;
-  } else if (faultaddress >= vbase2 && faultaddress < vtop2) {
-    paddr = (faultaddress - vbase2) + as->as_pbase2;
-  } else if (faultaddress >= stackbase && faultaddress < stacktop) {
-    paddr = (faultaddress - stackbase) + as->as_stackpbase;
+  // } else if ( faultaddress >= stackbase && faultaddress < stacktop) {
+  //   paddr = (faultaddress - stackbase) + as->as_stackpbase;
+  } else if ( (faultaddress >= vbase2 && faultaddress < vtop2) || ( faultaddress >= stackbase && faultaddress < stacktop) ) {
+    unsigned int i=0; for(i=0; i<PT_LENGTH;i++){
+      if(as->pagetable[i].va==faultaddress){break;}
+    }
+    if(i<PT_LENGTH){// found
+      paddr = as->pagetable[i].pa;
+    } else{
+      paddr = getppages(1);
+      unsigned int j=0; for(j=0; j<PT_LENGTH;j++){
+        if(as->pagetable[j].va==0){
+          as->pagetable[j].va=faultaddress;
+          as->pagetable[j].pa=paddr;
+          break;
+        } if(j==PT_LENGTH){ rp("vmfault PT full\n");assert(1==2);}
+      }
+    }
+    // paddr = (faultaddress - vbase2) + as->as_pbase2;
   } else {
     splx(spl);
-    //DEBUG(DB_VM, "\x1b[31m\n[vmfault]EFAULT 0x%x\n\x1b[0m",faultaddress);
-
+    DEBUG(DB_VM, "\x1b[31m\n[vmfault]EFAULT 0x%x\n\x1b[0m",faultaddress);
     return EFAULT;
   }
 
@@ -76,7 +90,7 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
     }
     ehi = faultaddress;
     elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-    //DEBUG(DB_VM, "\x1b[32mvm: 0x%x -> 0x%x [%d]\x1b[0m\n", faultaddress, paddr,i);
+    DEBUG(DB_VM, "\x1b[32mvm: %d 0x%x -> 0x%x [%d]\x1b[0m\n", faulttype,faultaddress, paddr,i);
     TLB_Write(ehi, elo, i);
     splx(spl);
     return 0;

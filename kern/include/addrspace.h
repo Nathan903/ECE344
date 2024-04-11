@@ -11,7 +11,11 @@ struct vnode;
  *
  * You write this.
  */
-
+#define PT_LENGTH 128
+struct pte{
+    vaddr_t va;
+    paddr_t pa;
+};
 struct addrspace {
 #if OPT_DUMBVM
 	vaddr_t as_vbase1;
@@ -28,9 +32,10 @@ struct addrspace {
 	paddr_t as_pbase1;
 	size_t as_npages1;
 	vaddr_t as_vbase2;
-	paddr_t as_pbase2;
+	// paddr_t as_pbase2;
+    struct pte pagetable[PT_LENGTH];
 	size_t as_npages2;
-	paddr_t as_stackpbase;
+	// paddr_t as_stackpbase;
 	//###################################
 	
 #endif
