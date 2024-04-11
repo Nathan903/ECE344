@@ -1,4 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct addrspace* as_create(void) {
   struct addrspace* as = kmalloc(sizeof(struct addrspace));
   if (as == NULL) { return NULL; }
@@ -50,7 +49,15 @@ int as_copy(struct addrspace *old, struct addrspace **ret) {
 
 void as_destroy(struct addrspace *as) { 
   //////////////////////START//////////////////////////
-  //Clean up as needed
+  // rp("DESTORY");
+  // kprintf("%d\n",curthread->pid);
+  lock_acquire(&cmlock);
+  unsigned int i; for (i = 0; i < COREMAP_SIZE; ++i) {
+      if (coremap[i].pid == curthread->pid) {
+          coremap[i].state=FREE_STATE;
+      }
+  }
+  lock_release(&cmlock);
   //////////////////////END//////////////////////////
   kfree(as); 
 }
@@ -81,7 +88,7 @@ void as_activate(struct addrspace *as) {
  */
 int as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz, int readable, int writeable, int executable) {
   //////////////////////START//////////////////////////
-
+  rp("as_define_region"); kprintf("%x %u\n", vaddr, sz);
   size_t npages;
 
   /* Align the region. First, the base... */
