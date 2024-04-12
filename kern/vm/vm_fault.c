@@ -64,6 +64,7 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
     if(i<PT_LENGTH){// found
       paddr = as->pagetable[i].pa;
     } else{
+      // kprintf("[vm] getting page ");
       paddr = getppages(1);
       unsigned int j=0; for(j=0; j<PT_LENGTH;j++){
         if(as->pagetable[j].va==0){
@@ -85,7 +86,7 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
 
   /* make sure it's page-aligned */
   assert((paddr & PAGE_FRAME) == paddr);
-
+  // kprintf(" [vm] done\n");
   for (i = 0; i < NUM_TLB; i++) {
     TLB_Read(&ehi, &elo, i);
     if (elo & TLBLO_VALID) {
@@ -93,11 +94,12 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
     }
     ehi = faultaddress;
     elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-    DEBUG(DB_VM, "\x1b[32mvm: %d 0x%x -> 0x%x [%d]\x1b[0m\n", faulttype,faultaddress, paddr,i);
+    DEBUG(DB_VM, "\x1b[32mvm: %d 0x%x -> 0x%x [%d][%d]\x1b[0m\n", faulttype,faultaddress, paddr,i, free_page_size() );
     TLB_Write(ehi, elo, i);
     splx(spl);
     return 0;
   }
+  kprintf(" [vm] not\n");
 
   rp("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
   splx(spl);

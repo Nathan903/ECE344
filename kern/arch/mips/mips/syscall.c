@@ -276,11 +276,14 @@ int sys_fork(struct trapframe* tf, int32_t* return_value){
         } \
     } while(0)
 int sys_execv(const char *userland_program, char **userland_args, int32_t* return_value){
-
-  if(userland_program==NULL || userland_args==NULL){
+  // kprintf("\n\n%p \n\n",userland_args);
+  // unsigned int q; for(q=0;q<PT_LENGTH;q++){
+  //   if(curthread->t_vmspace->pagetable[q].va)
+  //   kprintf("%d\n",curthread->t_vmspace->pagetable[q].va);
+  // }
+  if(userland_program==NULL || userland_args==NULL || (unsigned int)userland_args==0x80000000){
     (*return_value) = -1;
     return EFAULT;
-  
   }
   size_t str_len;
   char program[MAX_STR_LENGTH2];
@@ -343,7 +346,7 @@ intptr_t roundup(intptr_t num) {
 int sys_sbrk( intptr_t sz,  int32_t* return_value){
   (*return_value) = curthread->t_vmspace->heap_end;
   vaddr_t new_heapend = roundup(sz)+  curthread->t_vmspace->heap_end;
-  if(new_heapend<curthread->t_vmspace->heap_start){
+  if(new_heapend<curthread->t_vmspace->heap_start || sz<-4000000){
     (*return_value)=-1;return EINVAL;
   } if( new_heapend> (curthread->t_vmspace->heap_start+PAGE_SIZE*40) ) {
     (*return_value)=-1;return ENOMEM;

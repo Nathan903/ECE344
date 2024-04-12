@@ -66,10 +66,9 @@ int as_copy(struct addrspace *old, struct addrspace **ret) {
 void as_destroy(struct addrspace *as) { 
   //////////////////////START//////////////////////////
   // rp("DESTORY");
-  // kprintf("%d\n",curthread->pid);
   lock_acquire(&cmlock);
   unsigned int i; for (i = 0; i < COREMAP_SIZE; ++i) {
-      if (coremap[i].pid == curthread->pid) {
+      if (coremap[i].as == curthread->t_vmspace) {
           coremap[i].state=FREE_STATE;
       }
   }
@@ -147,7 +146,7 @@ int as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz, int readabl
 
 int as_prepare_load(struct addrspace *as) {
   //////////////////////START//////////////////////////
-  gp("load\n");
+  //gp("load\n");
   assert(as->as_pbase1 == 0);
   // assert(as->as_pbase2 == 0);
   // assert(as->as_stackpbase == 0);
@@ -167,7 +166,7 @@ int as_prepare_load(struct addrspace *as) {
   //   return ENOMEM;
   // }
   //////////////////////END//////////////////////////
-  gp("doneload\n");
+  //gp("doneload\n");
   
   return 0;
 }
