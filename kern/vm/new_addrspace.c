@@ -48,7 +48,7 @@ int as_copy(struct addrspace *old, struct addrspace **ret) {
     if(old->pagetable[i].va!=0){
       assert(new->pagetable[i].va==0);
       new->pagetable[i].va =old->pagetable[i].va;
-      new->pagetable[i].pa =getppages(1);
+      new->pagetable[i].pa =getppages_vm(1, new, DIRTY_STATE);
       
       memmove((void *)PADDR_TO_KVADDR(new->pagetable[i].pa),
             (const void *)PADDR_TO_KVADDR(old->pagetable[i].pa),
@@ -80,13 +80,7 @@ void as_destroy(struct addrspace *as) {
 void as_activate(struct addrspace *as) {
   (void)as;
   //////////////////////START//////////////////////////
-  int i, spl;
-  spl = splhigh();
-  //rp("[as_activate]: flashingTLB\n");
-  for (i = 0; i < NUM_TLB; i++) {
-    TLB_Write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
-  }
-  splx(spl);
+tlbclear();
   //////////////////////END//////////////////////////
 
 }
@@ -151,7 +145,7 @@ int as_prepare_load(struct addrspace *as) {
   // assert(as->as_pbase2 == 0);
   // assert(as->as_stackpbase == 0);
   assert(as->as_npages1<20);
-  as->as_pbase1 = getppages(as->as_npages1);
+  as->as_pbase1 = getppages_vm(as->as_npages1, as, FIXED_STATE);
   if (as->as_pbase1 == 0) {
     return ENOMEM;
   }

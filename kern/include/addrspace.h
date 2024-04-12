@@ -11,7 +11,7 @@ struct vnode;
  *
  * You write this.
  */
-#define PT_LENGTH 128
+#define PT_LENGTH 1180
 struct pte{
     vaddr_t va;
     paddr_t pa;

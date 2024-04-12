@@ -63,6 +63,11 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
     }
     if(i<PT_LENGTH){// found
       paddr = as->pagetable[i].pa;
+      if(paddr>0 && paddr<SWAPSIZE){
+        paddr = unevict(paddr);
+        as->pagetable[i].pa=paddr;
+        // rp("1\n");
+      }
     } else{
       // kprintf("[vm] getting page ");
       paddr = getppages(1);
@@ -83,7 +88,7 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
     rp("\x1b[31m\n[vmfault]EFAULT\x1b[0m");kprintf("0x%x\n",faultaddress);
     return EFAULT;
   }
-
+  // rp("2\n");
   /* make sure it's page-aligned */
   assert((paddr & PAGE_FRAME) == paddr);
   // kprintf(" [vm] done\n");

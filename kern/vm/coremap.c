@@ -15,7 +15,6 @@ void print_TLB_entries() {
     }
 }
 
-
 struct spinlock {
     volatile char held;
 };
@@ -39,26 +38,8 @@ void spinlock_release(struct spinlock *lock) {
 
 
 #define printf kprintf
-typedef struct{
-  char state;
-  // pid_t pid;
-  struct addrspace* as;
-  // addr = firstfree + i * 4096
-} coremap_entry;
 
-#define FREE_STATE 0
-#define FIXED_STATE 1
-#define DIRTY_STATE 2
-#define CLEAN_STATE 3
-#define I_TO_ADDR(i) ((i) * PAGE_SIZE+firstpaddr)
-#define rPADDR_TO_KVADDR(paddr) ((paddr)-MIPS_KSEG0)
-#define ADDR_I(paddr) (((paddr)-firstpaddr)/PAGE_SIZE)
-#define KADDR_I(paddr) (((paddr)-firstpaddr-MIPS_KSEG0)/PAGE_SIZE)
-#define COREMAP_SIZE 75
-//308k/4k
 
-coremap_entry coremap[COREMAP_SIZE];
-struct lock cmlock;
 
 void print_core_map() {
     kprintf("Coremap Entries:\n");
@@ -72,8 +53,22 @@ void print_core_map() {
 }
 int print_core_map2(int nargs, char **args){
     // make_swap();
-  // print_TLB_entries();
-  print_core_map();
+    // print_TLB_entries();
+    print_core_map();
+
+    // int i = evict();
+    // kprintf("%d\n",i);
+    // print_core_map();
+    // paddr_t paddr; 
+    // struct addrspace* as = coremap[i].as;
+    // unsigned int j=0; for(j=0; j<PT_LENGTH;j++){
+    //     kprintf("%u\n",as->pagetable[j].pa);
+    //     if(as->pagetable[j].pa>0 && as->pagetable[j].pa<10){
+    //       paddr= as->pagetable[j].pa;
+    //     }
+    // }
+    // paddr = unevict(paddr);
+
 
   if( 0 && (nargs==69 || args==NULL )){rp("f");}return 0;
 }
@@ -87,11 +82,10 @@ int free_page_size() {
     return free_size;
 }
 
-int get_pages(int npages, struct addrspace* as) {
-     char state = (as==NULL)? FIXED_STATE : DIRTY_STATE;
-     int start = 0;
-     int count = 0;
-     int i;int j;
+int get_pages(int npages, struct addrspace* as, char state) {
+    int start = 0;
+    int count = 0;
+    int i;int j;
 
     for (i = 0; i < COREMAP_SIZE; ++i) {
         if (coremap[i].state == FREE_STATE) {
@@ -103,17 +97,20 @@ int get_pages(int npages, struct addrspace* as) {
                 for (j = start; j < start + npages; ++j) {
                     coremap[j].state = state; 
                     coremap[j].as = as; 
+                    // if(state==DIRTY_STATE){
+                    // q_addtail(dirtyqueue, (void*) i);                        
+                    // }
                 }
-
-                return start; 
+                return start;
             }
         } else {
             count = 0;
         }
     }
+    rp("OM");
+    evict();
+    return get_pages(npages, as, state);
 
-    rp("\n\n OUT OF MEMORY \n\n");
-    assert( 1+1==11415); // no contiguous block of free pages
     return -1;
 }
 #undef printf
