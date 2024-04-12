@@ -39,7 +39,7 @@ paddr_t getppages_vm(unsigned long npages, struct addrspace* as,char state) {
   /////////////////////////////  
   assert((vm_bootstrapped) || ((!vm_bootstrapped)&&((curthread==nullptr) || (curthread->pid==0))));
   if(vm_bootstrapped){
-    // kprintf("[alloc]%d\n",free_page_size());
+    //gp("[alc]");kprintf("%d\n",free_page_size());
     lock_acquire(&cmlock);
     pagei = get_pages(npages, as,state );
     lock_release(&cmlock);
@@ -72,10 +72,13 @@ vaddr_t alloc_kpages(int npages) {
 
 
 void free_kpages(vaddr_t addr) {
-  //rp("e"); kprintf("%u %u %d\n",addr,KADDR_I(addr),free_page_size());
+    
+  //gp("e"); kprintf("%u %u %d %x\n",addr,KADDR_I(addr),free_page_size(),coremap[ KADDR_I(addr) ].npages);
   assert(COREMAP_SIZE>KADDR_I(addr) ); 
   lock_acquire(&cmlock);
-  coremap[ KADDR_I(addr) ].state=FREE_STATE;
+  char i; for(i=0;i<coremap[ KADDR_I(addr) ].npages;i++){
+    coremap[ KADDR_I(addr) +i].state=FREE_STATE;
+  }
 
   lock_release(&cmlock);
 }

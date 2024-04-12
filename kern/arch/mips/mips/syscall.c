@@ -344,6 +344,7 @@ intptr_t roundup(intptr_t num) {
   return num + (4 - num % 4) % 4;
 }
 int sys_sbrk( intptr_t sz,  int32_t* return_value){
+  //kprintf("\n\n\nsbrk\n\n\n");
   (*return_value) = curthread->t_vmspace->heap_end;
   vaddr_t new_heapend = roundup(sz)+  curthread->t_vmspace->heap_end;
   if(new_heapend<curthread->t_vmspace->heap_start || sz<-4000000){
@@ -352,6 +353,7 @@ int sys_sbrk( intptr_t sz,  int32_t* return_value){
     (*return_value)=-1;return ENOMEM;
   }
   curthread->t_vmspace->heap_end = new_heapend;
+  //kprintf("\n\n\nsbrk\n\n\n");
   return 0;
 }
 void mips_syscall(struct trapframe *tf) {

@@ -70,13 +70,25 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
       }
     } else{
       // kprintf("[vm] getting page ");
-      paddr = getppages(1);
-      unsigned int j=0; for(j=0; j<PT_LENGTH;j++){
-        if(as->pagetable[j].va==0){
-          as->pagetable[j].va=faultaddress;
-          as->pagetable[j].pa=paddr;
-          break;
-        } if(j==PT_LENGTH){ rp("vmfault PT full\n");assert(1==2);}
+          paddr = getppages(1);
+          unsigned int j=0; for(j=0; j<PT_LENGTH;j++){
+            if(as->pagetable[j].va==0){
+              as->pagetable[j].va=faultaddress;
+              as->pagetable[j].pa=paddr;
+              break;
+            } if(j==PT_LENGTH){ rp("vmfault PT full\n");assert(1==2);}
+          }
+      if((faultaddress >= vbase2 && faultaddress < vtop2)){
+        //kprintf("%x %x %x %x",vbase2, vtop2, as->heap_start, as->heap_end);gp("loadseg\n");
+        			//result = load_segment(v, ph.p_offset, ph.p_vaddr, ph.p_memsz, ph.p_filesz, ph.p_flags & PF_X);
+        
+        
+        
+        loadseg(as->v, faultaddress,as->ph);
+        
+        
+        
+        //gp("loadsegd\n");
       }
     }
     // paddr = (faultaddress - vbase2) + as->as_pbase2;
@@ -92,9 +104,16 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
   /* make sure it's page-aligned */
   assert((paddr & PAGE_FRAME) == paddr);
   // kprintf(" [vm] done\n");
-  for (i = 0; i < NUM_TLB; i++) {
+  unsigned int p =  (unsigned int) (curthread->pid)<<6;
+  assert((p & 0xFFFFFFC0) == p);
+  faultaddress |=(p & 0xFFF); // add pid to 6 bits
+  
+  i = TLB_Probe(faultaddress,0);
+
+  #define MAX(a, b) ((a) > (b) ? (a) : (b))
+  for (i = MAX(0,i); i < NUM_TLB; i++) {
     TLB_Read(&ehi, &elo, i);
-    if (elo & TLBLO_VALID) {
+    if (elo & TLBLO_VALID && ehi!=faultaddress) {
       continue;
     }
     ehi = faultaddress;

@@ -8,20 +8,12 @@ void gp(const char *text) {
 #include <machine/tlb.h>
 #include <queue.h>
 // struct queue* dirtyqueue;
-void tlbclear(){
-  int i, spl;
-  spl = splhigh();
-  for (i = 0; i < NUM_TLB; i++) {
-    TLB_Write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
-  }
-  splx(spl);
-}
-
 
 typedef struct{
   char state;
   // pid_t pid;
   struct addrspace* as;
+  char npages;
   // addr = firstfree + i * 4096
 } coremap_entry;
 
@@ -41,5 +33,30 @@ struct lock cmlock;
 paddr_t unevict(u_int32_t swapii);
 int evict();
 paddr_t getppages_vm(unsigned long npages, struct addrspace* as,char state);
+#include <types.h>
+#include <kern/errno.h>
+#include <lib.h>
+#include <uio.h>
+#include <vfs.h>
+#include <elf.h>
+#include <addrspace.h>
+#include <thread.h>
+#include <curthread.h>
+#include <vnode.h>
+void loadseg(struct vnode *v, vaddr_t ph_p_vaddr_plus_cc, Elf_Phdr ph);
 
+void tlbclear(){
+  int i, spl;
+  spl = splhigh();
+  u_int32_t ehi, elo;
+  unsigned int p =  (unsigned int)(curthread->pid)<<6;
+  
 
+  for (i = 0; i < NUM_TLB; i++) {
+    TLB_Read(&ehi, &elo, i);
+    if ( ((ehi& 0xFFF)>>6)!=(p & 0xFFF) || (((ehi& 0xFFF)>>6)!=0)) {
+        TLB_Write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
+    }
+  }
+  splx(spl);
+}

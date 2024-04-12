@@ -2,7 +2,8 @@
 #define _ADDRSPACE_H_
 
 #include <vm.h>
-
+#include <vnode.h>
+#include <elf.h>
 struct vnode;
 
 /* 
@@ -37,6 +38,8 @@ struct addrspace {
 	size_t as_npages2;
     vaddr_t heap_start;
     vaddr_t heap_end;
+    struct vnode * v;
+    Elf_Phdr ph;
 	// paddr_t as_stackpbase;
 	//###################################
 	

@@ -44,10 +44,10 @@ void spinlock_release(struct spinlock *lock) {
 void print_core_map() {
     kprintf("Coremap Entries:\n");
     kprintf("----------------\n");
-    kprintf("| Index | State | as   |\n");
+    kprintf("| Index | State | as   |    size |\n");
     kprintf("------------------------\n");
     unsigned int i;for (i=0; i < COREMAP_SIZE; ++i) {
-        kprintf("| %-6d| %-6d| %p| %d %u\n", i, coremap[i].state, coremap[i].as, I_TO_ADDR(i), PADDR_TO_KVADDR(I_TO_ADDR(i)));
+        kprintf("| %-6d| %-6d| %p|%x | %d  |%u\n", i, coremap[i].state, coremap[i].as, coremap[i].npages, I_TO_ADDR(i), PADDR_TO_KVADDR(I_TO_ADDR(i)));
     }
     kprintf("------------------------\n");
 }
@@ -96,11 +96,14 @@ int get_pages(int npages, struct addrspace* as, char state) {
             if (count == npages) {
                 for (j = start; j < start + npages; ++j) {
                     coremap[j].state = state; 
+                    
                     coremap[j].as = as; 
                     // if(state==DIRTY_STATE){
                     // q_addtail(dirtyqueue, (void*) i);                        
                     // }
                 }
+                coremap[start].npages = npages; 
+                    
                 return start;
             }
         } else {
