@@ -533,8 +533,7 @@ cmd_mainmenu(int n, char **a)
 ////////////////////////////////////////
 //
 // Command table.
-int print_core_map2(int nargs, char **args);
-int kmalloctest3(int nargs, char **args);
+
 static struct {
 	const char *name;
 	int (*func)(int nargs, char **args);
@@ -578,10 +577,8 @@ static struct {
 	{ "at",		arraytest },
 	{ "bt",		bitmaptest },
 	{ "qt",		queuetest },
-	{ "cm",	print_core_map2},
 	{ "km1",	malloctest },
 	{ "km2",	mallocstress },
-	{ "km3",	kmalloctest3 },
 #if OPT_NET
 	{ "net",	nettest },
 #endif
