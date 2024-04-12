@@ -72,7 +72,7 @@ void as_destroy(struct addrspace *as) {
           coremap[i].state=FREE_STATE;
       }
   }
-  if(as->v!=NULL) vfs_close(as->v);
+  // if(as->v!=NULL) vfs_close(as->v);
   lock_release(&cmlock);
   //kprintf("\n%d\n", sizeof(struct addrspace));
   //////////////////////END//////////////////////////
