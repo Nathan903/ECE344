@@ -25,7 +25,7 @@ typedef struct{
 #define rPADDR_TO_KVADDR(paddr) ((paddr)-MIPS_KSEG0)
 #define ADDR_I(paddr) (((paddr)-firstpaddr)/PAGE_SIZE)
 #define KADDR_I(paddr) (((paddr)-firstpaddr-MIPS_KSEG0)/PAGE_SIZE)
-#define COREMAP_SIZE 70 //77
+#define COREMAP_SIZE 79//77
 //308k/4k
 coremap_entry coremap[COREMAP_SIZE];
 struct lock cmlock;
@@ -60,3 +60,4 @@ void tlbclear(){
   }
   splx(spl);
 }
+

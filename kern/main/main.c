@@ -32,9 +32,9 @@ extern const char buildconfig[];
 /*
  * Copyright message for the OS/161 base code.
  */
-static const char harvard_copyright[] =
-    "Copyright (c) 2000, 2001, 2002, 2003\n"
-    "   President and Fellows of Harvard College.  All rights reserved.\n";
+// static const char harvard_copyright[] =
+//     "Copyright (c) 2000, 2001, 2002, 2003\n"
+//     "   President and Fellows of Harvard College.  All rights reserved.\n";
 
 
 /*
@@ -61,14 +61,14 @@ boot(void)
 	 * dev/generic/console.c).
 	 */
 
-	kprintf("\n");
+	// kprintf("\n");
 	kprintf("OS/161 base system version %s\n", BASE_VERSION);
-	kprintf("%s", harvard_copyright);
-	kprintf("\n");
+	// kprintf("%s", harvard_copyright);
+	// kprintf("\n");
 
-	kprintf("YOURLITTLEPONY's system version %s (%s #%d)\n", 
-		GROUP_VERSION, buildconfig, buildversion);
-	kprintf("\n");
+	// kprintf("YOURLITTLEPONY's system version %s (%s #%d)\n", 
+		// GROUP_VERSION, buildconfig, buildversion);
+	// kprintf("\n");
 
 	ram_bootstrap();
 	scheduler_bootstrap();

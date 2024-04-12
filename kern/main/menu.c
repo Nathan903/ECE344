@@ -554,7 +554,7 @@ static struct {
 	{ "mount",	cmd_mount },
 	{ "unmount",	cmd_unmount },
 	{ "bootfs",	cmd_bootfs },
-	{ "pf",		printfile },
+	// { "pf",		printfile },
 	{ "cd",		cmd_chdir },
 	{ "df",		cmd_df },
 	{ "pwd",	cmd_pwd },
@@ -575,9 +575,9 @@ static struct {
 	{ "kh",         cmd_kheapstats },
 
 	/* base system tests */
-	{ "at",		arraytest },
-	{ "bt",		bitmaptest },
-	{ "qt",		queuetest },
+	// { "at",		arraytest },
+	// { "bt",		bitmaptest },
+	// { "qt",		queuetest },
 	{ "cm",	print_core_map2},
 	{ "km1",	malloctest },
 	{ "km2",	mallocstress },
@@ -585,21 +585,21 @@ static struct {
 #if OPT_NET
 	{ "net",	nettest },
 #endif
-	{ "tt1",	threadtest },
-	{ "tt2",	threadtest2 },
-	{ "tt3",	threadtest3 },
-	{ "sy1",	semtest },
+	// { "tt1",	threadtest },
+	// { "tt2",	threadtest2 },
+	// { "tt3",	threadtest3 },
+	// { "sy1",	semtest },
 
 	/* synchronization assignment tests */
-	{ "sy2",	locktest },
-	{ "sy3",	cvtest },
+	// { "sy2",	locktest },
+	// { "sy3",	cvtest },
 
 	/* file system assignment tests */
-	{ "fs1",	fstest },
-	{ "fs2",	readstress },
-	{ "fs3",	writestress },
-	{ "fs4",	writestress2 },
-	{ "fs5",	createstress },
+	// { "fs1",	fstest },
+	// { "fs2",	readstress },
+	// { "fs3",	writestress },
+	// { "fs4",	writestress2 },
+	// { "fs5",	createstress },
 
 	{ NULL, NULL }
 };
