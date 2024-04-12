@@ -44,7 +44,7 @@ void swrite(u_int32_t i, void* buf){
 	// mk_kuio(struct uio *uio, void *kbuf, size_t len, off_t pos, enum uio_rw rw)
     mk_kuio(&u,buf,(size_t)PAGE_SIZE,(off_t)PAGE_SIZE*i,UIO_WRITE);
 	lock_release(&slock);
-    if(VOP_WRITE(swapvnode, &u)){rp("swrite");}
+    if(VOP_WRITE(swapvnode, &u)){rp("swrite");kprintf("%d\n",i);assert(0); }
 
 }
 void sread(u_int32_t  i, void* buf){
@@ -52,7 +52,7 @@ void sread(u_int32_t  i, void* buf){
 	lock_acquire(&slock);
     struct uio u;
     mk_kuio(&u,buf,(size_t)PAGE_SIZE,(off_t)PAGE_SIZE*i,UIO_READ);
-    if(VOP_READ(swapvnode, &u)){rp("sread");} 
+    if(VOP_READ(swapvnode, &u)){rp("sread");kprintf("%d\n",i);assert(0);} 
 	lock_release(&slock);
 }
 int ivictim=4;// <77
@@ -62,6 +62,7 @@ int evict(){ // make space, return swapi
 		make_swap();
 	}
 	// rp("evict");kprintf("%d\n",free_page_size());
+	if(swapi==SWAPSIZE){swapi=1; gp("OOOF\n");}
 	assert(swapi<SWAPSIZE);
   	ivictim=(ivictim+3)%COREMAP_SIZE;
 
