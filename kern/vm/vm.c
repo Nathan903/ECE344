@@ -11,7 +11,7 @@
 #include <synch.h>
 
 /* under dumbvm, always have 48k of user stack */
-#define DUMBVM_STACKPAGES    30
+#define DUMBVM_STACKPAGES   6969//30
 
 #define nullptr '\0'
 extern u_int32_t firstfree;   /* first free virtual address; set by start.S */
@@ -87,3 +87,4 @@ void free_kpages(vaddr_t addr) {
 #include "vm_fault.c"
 #include "new_addrspace.c"
 #include "swap.c"
+

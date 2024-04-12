@@ -55,6 +55,7 @@ int print_core_map2(int nargs, char **args){
     // make_swap();
     // print_TLB_entries();
     print_core_map();
+    kprintf("swapii %d",swapi);
 
     // int i = evict();
     // kprintf("%d\n",i);

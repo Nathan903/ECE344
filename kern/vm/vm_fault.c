@@ -58,6 +58,10 @@ int vm_fault(int faulttype, vaddr_t faultaddress) {
   // } else if ( faultaddress >= stackbase && faultaddress < stacktop) {
   //   paddr = (faultaddress - stackbase) + as->as_stackpbase;
   } else if ( (faultaddress >= vbase2 && faultaddress < vtop2) || ( faultaddress >= stackbase && faultaddress < stacktop) || (faultaddress >= as->heap_start && faultaddress < as->heap_end) ) {
+    if(( faultaddress >= stackbase && faultaddress < stacktop) && (faultaddress==(USERSTACK - SMARTVM_STACKPAGES * PAGE_SIZE))){
+        //rp("infiniterecursion...");kprintf("%d\n", USERSTACK-faultaddress);
+        splx(spl); return EFAULT;
+    }
     unsigned int i=0; for(i=0; i<PT_LENGTH;i++){
       if(as->pagetable[i].va==faultaddress){break;}
     }

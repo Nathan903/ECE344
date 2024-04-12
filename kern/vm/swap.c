@@ -8,7 +8,7 @@ struct vnode* swapvnode=NULL;
 char bitmap[SWAPSIZE]; //1280
 struct lock slock;
 char swap_setupped=0;
-u_int32_t  swapi=1;
+
 void make_swap(){ swap_setupped=1;
 	char p[]="lhd0raw:";
 	if(vfs_open(p, O_RDWR, &swapvnode)){

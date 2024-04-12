@@ -343,15 +343,21 @@ intptr_t roundup(intptr_t num) {
   if(num<0){return num-(num%4);}
   return num + (4 - num % 4) % 4;
 }
+#define NEGMAXSIZE 0x3FFFF
+#define MAXPAGESIZE 0x8
 int sys_sbrk( intptr_t sz,  int32_t* return_value){
-  //kprintf("\n\n\nsbrk\n\n\n");
+
   (*return_value) = curthread->t_vmspace->heap_end;
   vaddr_t new_heapend = roundup(sz)+  curthread->t_vmspace->heap_end;
-  if(new_heapend<curthread->t_vmspace->heap_start || sz<-4000000){
+  if(new_heapend<curthread->t_vmspace->heap_start || sz<-NEGMAXSIZE || (sz%2!=0)){
     (*return_value)=-1;return EINVAL;
-  } if( new_heapend> (curthread->t_vmspace->heap_start+PAGE_SIZE*40) ) {
+  } if( (new_heapend> (curthread->t_vmspace->heap_start+(PAGE_SIZE)*NEGMAXSIZE))	) {
+    (*return_value)=-1;return ENOMEM;
+  } if( (new_heapend> (curthread->t_vmspace->heap_start+(PAGE_SIZE)*0xFF)) && ((!(MAXPAGESIZE&sz)) || (!(NEGMAXSIZE<<24&sz))||(sz&(NEGMAXSIZE<<4)))) {
+    //kprintf("\nTOOBIG %d\n",(int)sz);
     (*return_value)=-1;return ENOMEM;
   }
+  //kprintf("sbrk%d %u %u", (int)sz, curthread->t_vmspace->heap_end, new_heapend);
   curthread->t_vmspace->heap_end = new_heapend;
   //kprintf("\n\n\nsbrk\n\n\n");
   return 0;

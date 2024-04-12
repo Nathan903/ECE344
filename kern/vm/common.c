@@ -30,6 +30,7 @@ typedef struct{
 coremap_entry coremap[COREMAP_SIZE];
 struct lock cmlock;
 #define SWAPSIZE 1280
+#define SMARTVM_STACKPAGES 100
 paddr_t unevict(u_int32_t swapii);
 int evict();
 paddr_t getppages_vm(unsigned long npages, struct addrspace* as,char state);
@@ -60,4 +61,5 @@ void tlbclear(){
   }
   splx(spl);
 }
+u_int32_t  swapi=1;
 
