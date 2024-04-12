@@ -38,6 +38,9 @@ load_segment(struct vnode *v, off_t offset, vaddr_t vaddr,
 	     size_t memsize, size_t filesize,
 	     int is_executable)
 {
+    //kprintf("v: %p, offset: %d, vaddr: %x, memsize: %u, filesize: %u, is_executable: %d\n",
+    //       (void *)v, offset, vaddr, memsize, filesize, is_executable);
+
 	struct uio u;
 	int result;
 	size_t fillamt;
@@ -80,7 +83,20 @@ load_segment(struct vnode *v, off_t offset, vaddr_t vaddr,
 	
 	return result;
 }
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
+void loadseg(struct vnode *v, vaddr_t ph_p_vaddr_plus_cc, Elf_Phdr ph) {
+    assert(ph_p_vaddr_plus_cc>=ph.p_vaddr && ph_p_vaddr_plus_cc<ph.p_vaddr+ph.p_memsz);
+    size_t cc = ph_p_vaddr_plus_cc-ph.p_vaddr;
+    size_t memsize = (cc+4096<=ph.p_memsz)?4096:ph.p_memsz%4096;
+    size_t fsize =  (ph.p_filesz<=cc)? 0:((cc+4096<=ph.p_filesz)?4096:ph.p_filesz%4096);
+    //kprintf(" load2 %u %u %u\n", fsize, ph.p_filesz, cc);
+    int result = load_segment(v, ph.p_offset+cc, ph.p_vaddr+cc, 
+        memsize, fsize,
+        ph.p_flags);
+    assert(result==0);
+}
 /*
  * Load an ELF executable user program into the current address space.
  *
@@ -219,10 +235,20 @@ load_elf(struct vnode *v, vaddr_t *entrypoint)
 				ph.p_type);
 			return ENOEXEC;
 		}
-
-		result = load_segment(v, ph.p_offset, ph.p_vaddr, 
-				      ph.p_memsz, ph.p_filesz,
-				      ph.p_flags & PF_X);
+		kprintf("loading %u %x %u %u\n",i,ph.p_vaddr, ph.p_memsz, ph.p_filesz);
+		if(i==1){
+			result = load_segment(v, ph.p_offset, ph.p_vaddr, 
+                ph.p_memsz, ph.p_filesz,
+				ph.p_flags & PF_X);
+		} else{
+		    curthread->t_vmspace->v = v;
+		    curthread->t_vmspace->ph = ph;
+		    
+			//result = load_segment(v, ph.p_offset, ph.p_vaddr, ph.p_memsz, ph.p_filesz, ph.p_flags);
+		    //unsigned int cc; for(cc=0; cc<ph.p_memsz;cc+=4096){
+		    //    loadseg(v, ph.p_vaddr+cc,  ph);
+			//}
+		}
 		if (result) {
 			return result;
 		}
@@ -237,3 +263,4 @@ load_elf(struct vnode *v, vaddr_t *entrypoint)
 
 	return 0;
 }
+

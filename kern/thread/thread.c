@@ -495,8 +495,9 @@ thread_exit(void)
 		 * context switch code.
 		 */
 		struct addrspace *as = curthread->t_vmspace;
-		curthread->t_vmspace = NULL;
 		as_destroy(as);
+		curthread->t_vmspace = NULL;
+
 	}
 
 	if (curthread->t_cwd) {

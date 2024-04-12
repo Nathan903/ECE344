@@ -2,7 +2,8 @@
 #define _ADDRSPACE_H_
 
 #include <vm.h>
-
+#include <vnode.h>
+#include <elf.h>
 struct vnode;
 
 /* 
@@ -11,7 +12,11 @@ struct vnode;
  *
  * You write this.
  */
-
+#define PT_LENGTH 1180
+struct pte{
+    vaddr_t va;
+    paddr_t pa;
+};
 struct addrspace {
 #if OPT_DUMBVM
 	vaddr_t as_vbase1;
@@ -28,9 +33,14 @@ struct addrspace {
 	paddr_t as_pbase1;
 	size_t as_npages1;
 	vaddr_t as_vbase2;
-	paddr_t as_pbase2;
+	// paddr_t as_pbase2;
+    struct pte pagetable[PT_LENGTH];
 	size_t as_npages2;
-	paddr_t as_stackpbase;
+    vaddr_t heap_start;
+    vaddr_t heap_end;
+    struct vnode * v;
+    Elf_Phdr ph;
+	// paddr_t as_stackpbase;
 	//###################################
 	
 #endif
