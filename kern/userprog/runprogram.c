@@ -15,7 +15,7 @@
 #include <vfs.h>
 #include <lib.h>
 #include <test.h>
-
+void rp(const char * s);
 /*
  * Load program "progname" and start running it in usermode.
  * Does not return except on error.
@@ -95,6 +95,7 @@ int runprogram_with_args(char *progname,char ** args, unsigned long nargs){
   /* Open the file. */
   result = vfs_open(progname, O_RDONLY, &v);
   if (result) {
+  rp("1");
     return result;
   }
 
@@ -109,6 +110,7 @@ int runprogram_with_args(char *progname,char ** args, unsigned long nargs){
   curthread->t_vmspace = as_create();
   if (curthread->t_vmspace == NULL) {
     vfs_close(v);
+    rp("2");
     return ENOMEM;
   }
 
@@ -120,6 +122,7 @@ int runprogram_with_args(char *progname,char ** args, unsigned long nargs){
   if (result) {
     /* thread_exit destroys curthread->t_vmspace */
     vfs_close(v);
+    rp("3");
     return result;
   }
 
@@ -130,7 +133,7 @@ int runprogram_with_args(char *progname,char ** args, unsigned long nargs){
   result = as_define_stack(curthread->t_vmspace, &stackptr);
   if (result) {
     /* thread_exit destroys curthread->t_vmspace */
-    return result;
+    rp("4");return result;
   }
   
   
@@ -143,7 +146,7 @@ int runprogram_with_args(char *progname,char ** args, unsigned long nargs){
   //kprintf("\n args_copy_len %d \n",args_copy_len);
   unsigned long i;for(i=0; i<nargs;i++){
     curlen =  strnlen(args[i]);
-    if (curlen ==-1){ return NOT_VALID_STR;}
+    if (curlen ==-1){rp("6"); return NOT_VALID_STR;}
     padding = (4-(curlen+1)%4)%4;
     assert( (curlen+padding+1)%4 == 0);
     args_copy_len+= curlen+padding+1;
@@ -187,7 +190,7 @@ int runprogram_with_args(char *progname,char ** args, unsigned long nargs){
     (userptr_t) stackptr /*userspace addr of argv*/,
     stackptr,
     entrypoint);
-
+rp("8");
   /* md_usermode does not return */
   panic("md_usermode returned\n");
   return EINVAL;

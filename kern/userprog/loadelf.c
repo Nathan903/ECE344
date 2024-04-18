@@ -203,6 +203,7 @@ load_elf(struct vnode *v, vaddr_t *entrypoint)
 
 	result = as_prepare_load(curthread->t_vmspace);
 	if (result) {
+		    kprintf("asp\n");
 		return result;
 	}
 
@@ -216,6 +217,7 @@ load_elf(struct vnode *v, vaddr_t *entrypoint)
 
 		result = VOP_READ(v, &ku);
 		if (result) {
+				    kprintf("66\n");
 			return result;
 		}
 
@@ -237,9 +239,12 @@ load_elf(struct vnode *v, vaddr_t *entrypoint)
 		}
 		kprintf("loading %u %x %u %u\n",i,ph.p_vaddr, ph.p_memsz, ph.p_filesz);
 		if(i==1){
-			result = load_segment(v, ph.p_offset, ph.p_vaddr, 
-                ph.p_memsz, ph.p_filesz,
-				ph.p_flags & PF_X);
+			//result = load_segment(v, ph.p_offset, ph.p_vaddr, 
+            //    ph.p_memsz, ph.p_filesz,
+			//	ph.p_flags & PF_X);
+            curthread->t_vmspace->vc = v;
+		    curthread->t_vmspace->phc = ph;
+		    
 		} else{
 		    curthread->t_vmspace->v = v;
 		    curthread->t_vmspace->ph = ph;
@@ -250,12 +255,15 @@ load_elf(struct vnode *v, vaddr_t *entrypoint)
 			//}
 		}
 		if (result) {
+		    kprintf("33\n");
 			return result;
 		}
 	}
 
 	result = as_complete_load(curthread->t_vmspace);
 	if (result) {
+		    kprintf("44\n");
+
 		return result;
 	}
 

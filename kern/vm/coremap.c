@@ -50,6 +50,8 @@ void print_core_map() {
         kprintf("| %-6d| %-6d| %p|%x | %d  |%u\n", i, coremap[i].state, coremap[i].as, coremap[i].npages, I_TO_ADDR(i), PADDR_TO_KVADDR(I_TO_ADDR(i)));
     }
     kprintf("------------------------\n");
+    
+    
 }
 int print_core_map2(int nargs, char **args){
     // make_swap();
@@ -99,6 +101,7 @@ int get_pages(int npages, struct addrspace* as, char state) {
                     coremap[j].state = state; 
                     
                     coremap[j].as = as; 
+                    //if( as==(struct addrspace* )0x80037f00 && j==(int)13) rp("here1\n");
                     // if(state==DIRTY_STATE){
                     // q_addtail(dirtyqueue, (void*) i);                        
                     // }

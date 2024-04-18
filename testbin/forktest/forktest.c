@@ -110,6 +110,7 @@ test(int nowait)
 	 */
 
 	pid0 = dofork();
+	printf("hi\n");
 	putchar('0');
 	check();
 	pid1 = dofork();

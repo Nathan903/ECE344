@@ -4,6 +4,13 @@ void rp(const char *text) {
 void gp(const char *text) {
     kprintf("\x1b[32m%s\x1b[0m", text);
 }
+void sr() {
+    kprintf("\x1b[32m");
+}
+
+void er() {
+    kprintf("\x1b[0m\n");
+}
 #include <types.h>
 #include <machine/tlb.h>
 #include <queue.h>
@@ -14,6 +21,7 @@ typedef struct{
   // pid_t pid;
   struct addrspace* as;
   char npages;
+
   // addr = firstfree + i * 4096
 } coremap_entry;
 
@@ -25,13 +33,13 @@ typedef struct{
 #define rPADDR_TO_KVADDR(paddr) ((paddr)-MIPS_KSEG0)
 #define ADDR_I(paddr) (((paddr)-firstpaddr)/PAGE_SIZE)
 #define KADDR_I(paddr) (((paddr)-firstpaddr-MIPS_KSEG0)/PAGE_SIZE)
-#define COREMAP_SIZE 79//77
+#define COREMAP_SIZE 77//77
 //308k/4k
 coremap_entry coremap[COREMAP_SIZE];
 struct lock cmlock;
 #define SWAPSIZE 1280
 #define SMARTVM_STACKPAGES 100
-paddr_t unevict(u_int32_t swapii);
+paddr_t unevict(u_int32_t swapii, paddr_t* as);
 int evict();
 paddr_t getppages_vm(unsigned long npages, struct addrspace* as,char state);
 #include <types.h>

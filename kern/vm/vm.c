@@ -26,10 +26,12 @@ void vm_bootstrap(void) {
   //dirtyqueue= q_create(COREMAP_SIZE);
 }
 paddr_t getppages(unsigned long npages) {
+ // rp("getp\n");
   struct addrspace* as = (curthread==nullptr) ? NULL : curthread->t_vmspace;
   return getppages_vm(npages, as, (as==NULL)? FIXED_STATE : DIRTY_STATE);
 }
 paddr_t getppages_vm(unsigned long npages, struct addrspace* as,char state) {
+ // rp("getpvm\n");
   if (npages>20){
     rp("getppageBIG"); kprintf("%ld\n",npages);
     npages=20;
@@ -56,10 +58,19 @@ paddr_t getppages_vm(unsigned long npages, struct addrspace* as,char state) {
 }
 
 vaddr_t alloc_kpages(int npages) {
-  if(npages!=1) rp("NPAGES!=1"); //assert(npages==1);
+  //if(npages!=1) rp("NPAGES!=1"); //assert(npages==1);
   //kprintf("alloc: firstaddr%u lastaddr%u firstfree%u freesize:%uK\n",firstpaddr, lastpaddr, firstfree, (lastpaddr-firstpaddr)/1024);
   paddr_t pa;
-  pa = getppages(npages);
+  rp("npages\n");
+  if(vm_bootstrapped && curthread!=NULL && curthread->pid!=0 && curthread->t_vmspace!=NULL){
+    //curthread->t_vmspace->pagetable[];
+      pa = getppages_vm(npages,curthread->t_vmspace, DIRTY_STATE);
+
+  }else{
+    pa = getppages_vm(npages,NULL, FIXED_STATE);
+
+  }
+
   if (pa == 0) {
     return 0;
   }

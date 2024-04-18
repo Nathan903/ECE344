@@ -30,7 +30,7 @@ struct addrspace {
 	/* Put stuff here for your VM system */
     //###################################
 	vaddr_t as_vbase1;
-	paddr_t as_pbase1;
+//	paddr_t as_pbase1;
 	size_t as_npages1;
 	vaddr_t as_vbase2;
 	// paddr_t as_pbase2;
@@ -40,6 +40,8 @@ struct addrspace {
     vaddr_t heap_end;
     struct vnode * v;
     Elf_Phdr ph;
+        struct vnode * vc;
+    Elf_Phdr phc;
 	// paddr_t as_stackpbase;
 	//###################################
 	

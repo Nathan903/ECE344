@@ -3,7 +3,7 @@ struct addrspace* as_create(void) {
   if (as == NULL) { return NULL; }
   //////////////////////START//////////////////////////
   as->as_vbase1 = 0;
-  as->as_pbase1 = 0;
+  //as->as_pbase1 = 0;
   as->as_npages1 = 0;
   as->as_vbase2 = 0;
   // as->as_pbase2 = 0;
@@ -32,13 +32,13 @@ int as_copy(struct addrspace *old, struct addrspace **ret) {
     return ENOMEM;
   }
 
-  assert(new->as_pbase1 != 0);
+ // assert(new->as_pbase1 != 0);
   // assert(new->as_pbase2 != 0);
   // assert(new->as_stackpbase != 0);
 
-  memmove((void *)PADDR_TO_KVADDR(new->as_pbase1),
-          (const void *)PADDR_TO_KVADDR(old->as_pbase1),
-          old->as_npages1 * PAGE_SIZE);
+//  memmove((void *)PADDR_TO_KVADDR(new->as_pbase1),
+  //        (const void *)PADDR_TO_KVADDR(old->as_pbase1),
+   //       old->as_npages1 * PAGE_SIZE);
 
   // memmove((void *)PADDR_TO_KVADDR(new->as_pbase2),
   //         (const void *)PADDR_TO_KVADDR(old->as_pbase2),
@@ -48,6 +48,7 @@ int as_copy(struct addrspace *old, struct addrspace **ret) {
     if(old->pagetable[i].va!=0){
       assert(new->pagetable[i].va==0);
       new->pagetable[i].va =old->pagetable[i].va;
+        //rp("ascopy\n");
       new->pagetable[i].pa =getppages_vm(1, new, DIRTY_STATE);
       
       memmove((void *)PADDR_TO_KVADDR(new->pagetable[i].pa),
@@ -101,7 +102,7 @@ void as_activate(struct addrspace *as) {
  */
 int as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz, int readable, int writeable, int executable) {
   //////////////////////START//////////////////////////
-  rp("as_define_region"); kprintf("%x %u r%d w%d e%d\n", vaddr, sz,readable,writeable,executable);
+  //rp("as_define_region"); kprintf("%x %u r%d w%d e%d\n", vaddr, sz,readable,writeable,executable);
   size_t npages;
 
   /* Align the region. First, the base... */
@@ -145,15 +146,16 @@ int as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz, int readabl
 int as_prepare_load(struct addrspace *as) {
   //////////////////////START//////////////////////////
   //gp("load\n");
-  assert(as->as_pbase1 == 0);
+  //assert(as->as_pbase1 == 0);
   // assert(as->as_pbase2 == 0);
   // assert(as->as_stackpbase == 0);
   assert(as->as_npages1<20);
-  as->as_pbase1 = getppages_vm(as->as_npages1, as, FIXED_STATE);
-  if (as->as_pbase1 == 0) {
+    //rp("asprepare\n");
+  
+/*  if (as->as_pbase1 == 0) {
     return ENOMEM;
   }
-
+*/
   // as->as_pbase2 = getppages(as->as_npages2);
   // if (as->as_pbase2 == 0) {
   //   return ENOMEM;
